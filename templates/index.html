@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>Agenda de Trabalho</title>
+    <style>
+        .appointments-container {
+            position: relative;
+        }
+
+        .time-markers {
+            position: relative;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 p-2">
+    <div class="mx-auto">
+        <div class="bg-white rounded-lg shadow-lg p-3 mb-3">
+            <div class="flex justify-between items-center mb-3">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold">Agenda de Trabalho</h1>
+                    <span class="ml-4 text-gray-600" id="userDisplayName">Usuário: </span>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="openWorkplaceModal()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        Locais de Trabalho
+                    </button>
+                    <button onclick="openConfigModal()" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+                        Configurações
+                    </button>
+                    <button onclick="openAppointmentModal()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                        Novo Compromisso
+                    </button>
+                    <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                        Sair
+                    </button>
+                </div>
+            </div>
+            <div id="calendar" class="grid gap-2"></div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6 mt-6">
+            <div class="grid grid-cols-1 gap-4 mb-8">
+                <div class="p-4 rounded bg-gray-100">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="font-bold text-xl">Resumo por Local de Trabalho</h3>
+                        <select id="periodSelect" class="p-2 border rounded" onchange="updateReports()">
+                            <option value="week">Esta Semana</option>
+                            <option value="month">Este Mês</option>
+                        </select>
+                    </div>
+                    <div id="workplaceSummaries" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Aqui entram os cards de resumo de cada local de trabalho -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-4 rounded bg-gray-100">
+                    <h3 class="font-bold mb-2">Resumo Semanal</h3>
+                    <div id="weeklySummary" class="space-y-1">
+                        <p>Total Horas: <span class="text-xl total-hours">0h</span></p>
+                        <p>Valor Total: R$<span class="total-value">0,00</span></p>
+                    </div>
+                </div>
+                <div class="p-4 rounded bg-gray-100">
+                    <h3 class="font-bold mb-2">Resumo Mensal</h3>
+                    <div id="monthlySummary" class="space-y-1">
+                        <p>Total Horas: <span class="text-xl total-hours">0h</span></p>
+                        <p>Valor Total: R$<span class="total-value">0,00</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Configurações -->
+    <div id="configModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg w-[600px]">
+            <h2 class="text-xl font-bold mb-4">Configurações</h2>
+            <form id="configForm">
+                <div class="mb-4">
+                    <label class="block mb-2">Dias da Semana para Exibir</label>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" name="daysToShow" value="1" class="mr-2" checked>
+                            Segunda
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" name="daysToShow" value="2" class="mr-2" checked>
+                            Terça
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" name="daysToShow" value="3" class="mr-2" checked>
+                            Quarta
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" name="daysToShow" value="4" class="mr-2" checked>
+                            Quinta
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" name="daysToShow" value="5" class="mr-2" checked>
+                            Sexta
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" name="daysToShow" value="6" class="mr-2" checked>
+                            Sábado
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" name="daysToShow" value="0" class="mr-2">
+                            Domingo
+                        </label>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block mb-2">Horário Padrão de Início</label>
+                    <input type="time" id="defaultStartTime" class="w-full p-2 border rounded" value="07:00">
+                </div>
+                <div class="mb-4">
+                    <label class="block mb-2">Horário Padrão de Término</label>
+                    <input type="time" id="defaultEndTime" class="w-full p-2 border rounded" value="23:00">
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" onclick="closeConfigModal()" class="ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancelar</button>
+                    <button type="submit" class="ml-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Locais de Trabalho -->
+    <div id="workplaceModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg w-[800px] max-h-[90vh] overflow-y-auto">
+            <h2 class="text-xl font-bold mb-4">Gerenciar Locais de Trabalho</h2>
+            <div id="workplacesList" class="space-y-4 mb-6">
+                <!-- Aqui serão inseridos os locais de trabalho -->
+            </div>
+            <button id="addWorkplaceBtn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mb-4">
+                <i class="fas fa-plus mr-2"></i>Adicionar Local de Trabalho
+            </button>
+            <div id="workplaceForm" class="hidden border p-4 rounded mb-4">
+                <h3 class="font-bold mb-2" id="workplaceFormTitle">Novo Local de Trabalho</h3>
+                <form id="newWorkplaceForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="hidden" id="workplaceId">
+                    <div>
+                        <label class="block text-sm mb-1">Nome</label>
+                        <input type="text" id="workplaceName" class="w-full p-2 border rounded" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm mb-1">Cor</label>
+                        <input type="color" id="workplaceColor" class="w-full p-1 h-10 border rounded">
+                    </div>
+                    <div>
+                        <label class="block text-sm mb-1">Valor por Hora</label>
+                        <input type="number" id="workplaceHourRate" class="w-full p-2 border rounded" step="0.01" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm mb-1">Acréscimo Hora-Aula (%)</label>
+                        <input type="number" id="workplaceBonus" class="w-full p-2 border rounded" min="0" max="100" step="1" value="0">
+                    </div>
+                    <div>
+                        <label class="block text-sm mb-1">Período de Carência (minutos)</label>
+                        <input type="number" id="workplaceGrace" class="w-full p-2 border rounded" min="0" step="5" value="60">
+                    </div>
+                    <div>
+                        <label class="block text-sm mb-1">Relacionado com</label>
+                        <select id="workplaceRelated" class="w-full p-2 border rounded">
+                            <option value="">Nenhum</option>
+                            <!-- Aqui serão inseridas as opções de locais relacionados -->
+                        </select>
+                    </div>
+                    <div class="md:col-span-2 flex justify-end gap-2">
+                        <button type="button" onclick="hideWorkplaceForm()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancelar</button>
+                        <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Salvar</button>
+                    </div>
+                </form>
+            </div>
+            <div class="flex justify-end mt-4">
+                <button onclick="closeWorkplaceModal()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Compromisso -->
+    <div id="appointmentModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg w-[600px]">
+            <h2 class="text-xl font-bold mb-4" id="appointmentFormTitle">Novo Compromisso</h2>
+            <form id="appointmentForm">
+                <input type="hidden" id="editingId">
+                <div class="mb-4">
+                    <label class="block mb-2">Dia da Semana</label>
+                    <select id="dayOfWeek" class="w-full p-2 border rounded" required>
+                        <option value="1">Segunda</option>
+                        <option value="2">Terça</option>
+                        <option value="3">Quarta</option>
+                        <option value="4">Quinta</option>
+                        <option value="5">Sexta</option>
+                        <option value="6">Sábado</option>
+                        <option value="0">Domingo</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block mb-2">Local de Trabalho</label>
+                    <select id="workplace" class="w-full p-2 border rounded" required>
+                        <!-- Aqui serão inseridas as opções de locais de trabalho -->
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block mb-2">Tipo de Hora</label>
+                    <div class="flex gap-4">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="hourType" value="HT" class="form-radio" checked required>
+                            <span class="ml-2">Hora Trabalho (HT)</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="hourType" value="HA" class="form-radio">
+                            <span class="ml-2">Hora Aula (HA)</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="hourType" value="HAE" class="form-radio">
+                            <span class="ml-2">HAE</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block mb-2">Horário de Entrada</label>
+                    <input type="time" id="startTime" class="w-full p-2 border rounded" required onchange="calculateDuration()">
+                </div>
+                <div class="mb-4">
+                    <label class="block mb-2">Horário de Saída</label>
+                    <input type="time" id="endTime" class="w-full p-2 border rounded" required onchange="calculateDuration()">
+                </div>
+                <div class="mb-4">
+                    <label class="block mb-2">Descrição</label>
+                    <textarea id="description" class="w-full p-2 border rounded" required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label class="block mb-2">Duração (horas)</label>
+                    <input type="number" id="duration" class="w-full p-2 border rounded" step="0.5" readonly>
+                </div>
+                <div class="flex justify-between">
+                    <button type="button" onclick="closeAppointmentModal()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancelar</button>
+                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+
+</html>

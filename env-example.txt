@@ -1,0 +1,6 @@
+# Configurações do Flask
+SECRET_KEY=suachavesecretaaqui
+
+# Configurações do Supabase
+SUPABASE_URL=https://seuprojetoid.supabase.co
+SUPABASE_KEY=suasupabaseservicerolekey

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>Login - Agenda de Trabalho</title>
+</head>
+
+<body class="bg-gray-100 h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-[500px] max-w-full mx-2">
+        <div class="mb-6 text-center">
+            <h1 class="text-2xl font-bold">Agenda de Trabalho</h1>
+            <p class="text-gray-600">Faça login para continuar</p>
+        </div>
+
+        <div class="flex mb-4">
+            <button id="loginTabBtn" class="flex-1 py-2 border-b-2 border-blue-500 text-blue-500 font-medium">Login</button>
+            <button id="registerTabBtn" class="flex-1 py-2 border-b-2 border-gray-300 text-gray-500 font-medium">Cadastro</button>
+        </div>
+
+        <!-- Formulário de Login -->
+        <form id="loginForm" class="space-y-4">
+            <div>
+                <label class="block text-sm mb-1">Email</label>
+                <input type="email" id="loginEmail" class="w-full p-2 border rounded" required>
+            </div>
+            <div>
+                <label class="block text-sm mb-1">Senha</label>
+                <input type="password" id="loginPassword" class="w-full p-2 border rounded" required>
+            </div>
+            <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Entrar</button>
+        </form>
+
+        <!-- Formulário de Cadastro (Inicialmente oculto) -->
+        <form id="registerForm" class="space-y-4 hidden">
+            <div>
+                <label class="block text-sm mb-1">Nome Completo</label>
+                <input type="text" id="registerName" class="w-full p-2 border rounded" required>
+            </div>
+            <div>
+                <label class="block text-sm mb-1">CPF</label>
+                <input type="text" id="registerCPF" class="w-full p-2 border rounded" required>
+            </div>
+            <div>
+                <label class="block text-sm mb-1">Email</label>
+                <input type="email" id="registerEmail" class="w-full p-2 border rounded" required>
+            </div>
+            <div>
+                <label class="block text-sm mb-1">Senha</label>
+                <input type="password" id="registerPassword" class="w-full p-2 border rounded" required>
+            </div>
+            <div>
+                <label class="block text-sm mb-1">Confirmar Senha</label>
+                <input type="password" id="registerPasswordConfirm" class="w-full p-2 border rounded" required>
+            </div>
+            <button type="submit" class="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600">Cadastrar</button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Alternar entre as abas de login e registro
+            const loginTabBtn = document.getElementById('loginTabBtn');
+            const registerTabBtn = document.getElementById('registerTabBtn');
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+
+            loginTabBtn.addEventListener('click', function() {
+                loginTabBtn.classList.remove('border-gray-300', 'text-gray-500');
+                loginTabBtn.classList.add('border-blue-500', 'text-blue-500');
+                registerTabBtn.classList.remove('border-blue-500', 'text-blue-500');
+                registerTabBtn.classList.add('border-gray-300', 'text-gray-500');
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+            });
+
+            registerTabBtn.addEventListener('click', function() {
+                registerTabBtn.classList.remove('border-gray-300', 'text-gray-500');
+                registerTabBtn.classList.add('border-blue-500', 'text-blue-500');
+                loginTabBtn.classList.remove('border-blue-500', 'text-blue-500');
+                loginTabBtn.classList.add('border-gray-300', 'text-gray-500');
+                registerForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+            });
+
+            // Envio do formulário de login
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('loginEmail').value;
+                const senha = document.getElementById('loginPassword').value;
+                
+                fetch('/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, senha })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.sucesso) {
+                        window.location.href = '/';
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro',
+                            text: data.mensagem || 'Erro ao fazer login'
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: 'Falha ao comunicar com o servidor'
+                    });
+                });
+            });
+
+            // Envio do formulário de registro
+            registerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const nome = document.getElementById('registerName').value;
+                const cpf = document.getElementById('registerCPF').value;
+                const email = document.getElementById('registerEmail').value;
+                const senha = document.getElementById('registerPassword').value;
+                const confirmarSenha = document.getElementById('registerPasswordConfirm').value;
+                
+                // Validação básica
+                if (senha !== confirmarSenha) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: 'As senhas não coincidem'
+                    });
+                    return;
+                }
+                
+                // Validar CPF (formato básico)
+                if (!/^\d{3}\.\d{3}\.\d{3}\-\d{2}$/.test(cpf) && !/^\d{11}$/.test(cpf)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: 'CPF inválido. Use o formato 000.000.000-00 ou 00000000000'
+                    });
+                    return;
+                }
+                
+                fetch('/auth/registrar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ nome, cpf, email, senha })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.sucesso) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sucesso',
+                            text: 'Conta criada com sucesso! Você já pode fazer login.',
+                            confirmButtonText: 'Ir para Login'
+                        }).then(() => {
+                            // Alternar para a aba de login
+                            loginTabBtn.click();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro',
+                            text: data.mensagem || 'Erro ao registrar conta'
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro',
+                        text: 'Falha ao comunicar com o servidor'
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
