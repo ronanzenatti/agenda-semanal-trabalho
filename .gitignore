@@ -1,0 +1,79 @@
+# Ambiente virtual
+venv/
+env/
+ENV/
+virtualenv/
+.venv/
+
+# Arquivos de ambiente e configuração
+.env
+.env.local
+.env.development
+.env.production
+*.env
+
+# Arquivos de cache Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Arquivos de distribuição / empacotamento
+dist/
+build/
+*.egg-info/
+.eggs/
+*.egg
+
+# Arquivos de banco de dados local
+*.db
+*.sqlite
+*.sqlite3
+
+# Arquivos de log
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Arquivos da IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+.project
+.pydevproject
+.settings/
+
+# Arquivos temporários
+temp/
+tmp/
+.tmp/
+
+# Arquivos gerados automaticamente
+node_modules/
+bower_components/
+
+# Arquivos específicos do Flask
+instance/
+.webassets-cache
+flask_session/
+
+# Arquivos específicos do Vercel
+.vercel
+.now
+
+# Arquivos específicos do Supabase
+supabase/.branches/
+supabase/.temp/
+
+# Arquivos de certificado
+*.pem
+*.key
+*.crt

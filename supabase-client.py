@@ -10,4 +10,4 @@ SUPABASE_URL = os.getenv('SUPABASE_URL')
 SUPABASE_KEY = os.getenv('SUPABASE_KEY')
 
 # Criar cliente
-supabase_client: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+supabase_client = create_client(SUPABASE_URL, SUPABASE_KEY)
