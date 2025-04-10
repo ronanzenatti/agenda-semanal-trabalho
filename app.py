@@ -350,6 +350,20 @@ def obter_configuracoes():
             .execute()
             
         if resposta.data:
+            return jsonify({"sucesso": True, "configuracoes": resposta.data[0]})
+        else:
+            # Criar configurações padrão se não existirem
+            configuracoes_padrao = {
+                "usuario_id": session['usuario_id'],
+                "dias_semana": [1, 2, 3, 4, 5, 6],
+                "hora_inicio_padrao": "07:00",
+                "hora_fim_padrao": "23:00"
+            }
+            
+            resposta_criacao = supabase_client.table('configuracoes_usuario')\
+                .insert(configuracoes_padrao)\
+                .execute()
+                
             return jsonify({"sucesso": True, "configuracoes": resposta_criacao.data[0]})
     except Exception as e:
         return jsonify({"sucesso": False, "mensagem": str(e)}), 400
@@ -434,9 +448,9 @@ def relatorio_semanal():
             locais[local_id]['total_horas'] = locais[local_id]['base_horas'] + locais[local_id]['acrescimo_horas']
             locais[local_id]['valor_total'] = locais[local_id]['total_horas'] * float(local['valor_hora'])
             
-            # Adicionar ao total geral
-            total_horas = sum([l['total_horas'] for l in locais.values()])
-            total_valor = sum([l['valor_total'] for l in locais.values()])
+        # Adicionar ao total geral
+        total_horas = sum([l['total_horas'] for l in locais.values()])
+        total_valor = sum([l['valor_total'] for l in locais.values()])
         
         return jsonify({
             "sucesso": True, 
@@ -483,18 +497,4 @@ def relatorio_mensal():
         return jsonify({"sucesso": False, "mensagem": str(e)}), 400
 
 if __name__ == '__main__':
-    app.run(debug=True)acoes": resposta.data[0]})
-        else:
-            # Criar configurações padrão se não existirem
-            configuracoes_padrao = {
-                "usuario_id": session['usuario_id'],
-                "dias_semana": [1, 2, 3, 4, 5, 6],
-                "hora_inicio_padrao": "07:00",
-                "hora_fim_padrao": "23:00"
-            }
-            
-            resposta_criacao = supabase_client.table('configuracoes_usuario')\
-                .insert(configuracoes_padrao)\
-                .execute()
-                
-            return jsonify({"sucesso": True, "configuracoes": resposta_criacao.data[0]})
+    app.run(debug=True)

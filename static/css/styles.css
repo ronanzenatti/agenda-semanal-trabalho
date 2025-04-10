@@ -1,0 +1,108 @@
+/* Estilos gerais */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    line-height: 1.5;
+    color: #333;
+}
+
+/* Calendário */
+.appointments-container {
+    position: relative;
+    background-color: #f9fafb;
+    border-radius: 0.25rem;
+}
+
+/* Marcadores de tempo */
+.time-markers {
+    position: relative;
+    z-index: 1;
+}
+
+/* Compromissos */
+.appointment {
+    position: absolute;
+    transition: all 0.2s;
+    overflow: hidden;
+    border-radius: 0.25rem;
+    z-index: 2;
+    color: white;
+}
+
+.appointment:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+/* Modais */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 100;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    width: 90%;
+    max-width: 600px;
+    margin: 2rem auto;
+}
+
+/* Formulários */
+input, select, textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.25rem;
+    margin-bottom: 1rem;
+}
+
+button {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+/* Tooltip para fornecer informações adicionais ao passar o mouse */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltip-text {
+    visibility: hidden;
+    width: 200px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .grid-cols-2, .grid-cols-3, .grid-cols-4 {
+        grid-template-columns: 1fr;
+    }
+    
+    .calendar-day {
+        min-height: 150px;
+    }
+}
