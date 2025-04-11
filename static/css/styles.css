@@ -33,7 +33,7 @@ body {
     transform: translateY(-1px);
 }
 
-/* Modais */
+/* Modais - Ajustando z-index para evitar sobreposição incorreta */
 .modal {
     display: none;
     position: fixed;
@@ -43,6 +43,15 @@ body {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 100;
+}
+
+/* Z-index aumentado para todos os modais fixos */
+#configModal, 
+#workplaceModal, 
+#appointmentModal, 
+#helpModal {
+    position: fixed;
+    z-index: 1000; /* Valor alto para garantir que fique acima de tudo */
 }
 
 .modal-content {
@@ -96,7 +105,7 @@ button {
     opacity: 1;
 }
 
-/* Menu móvel */
+/* Menu móvel - ajustado para ter z-index alto, mas menor que os modais */
 .mobile-menu {
     display: none;
     position: fixed;
@@ -106,7 +115,7 @@ button {
     width: 80%;
     max-width: 300px;
     background-color: white;
-    z-index: 1000;
+    z-index: 900;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
     transform: translateX(-100%);
     transition: transform 0.3s ease;
@@ -125,7 +134,7 @@ button {
     width: 100vw;
     height: 100vh;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 999;
+    z-index: 899;
 }
 
 .mobile-menu-overlay.active {
