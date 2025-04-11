@@ -327,7 +327,7 @@ function renderizarCompromissos() {
                     </button>
                 </div>
             </div>
-            <div>${compromisso.hora_inicio} - ${compromisso.hora_fim}</div> <hr>
+            <div class="text-end font-bold">${compromisso.hora_inicio} - ${compromisso.hora_fim}</div> <hr>
             <div class="text-sm mt-3">${compromisso.descricao}</div>
         `;
         
