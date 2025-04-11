@@ -913,3 +913,12 @@ function formatarCPF(cpf) {
     // Formatar como 000.000.000-00
     return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
 }
+
+// Funções para o modal de ajuda
+function openHelpModal() {
+    document.getElementById('helpModal').classList.remove('hidden');
+}
+
+function closeHelpModal() {
+    document.getElementById('helpModal').classList.add('hidden');
+}
