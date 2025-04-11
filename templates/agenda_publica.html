@@ -16,26 +16,28 @@
             <div class="flex justify-between items-center mb-3">
                 <div class="flex flex-col">
                     <h1 class="text-xl md:text-2xl font-bold">Agenda de Trabalho</h1>
-                    <span class="text-gray-600 text-sm md:text-base"><b>{{ usuario.nome }}</b> ({{ usuario.cpf }})</span>
+                    <span class="text-blue-600 text-sm md:text-base"><b>{{ usuario.nome }}</b> ({{ usuario.cpf
+                        }})</span>
                 </div>
                 <div>
-                    <a href="/login" class="bg-blue-500 text-white px-3 py-1 md:px-4 md:py-2 rounded hover:bg-blue-600 font-bold text-sm md:text-base">
+                    <a href="/login"
+                        class="bg-blue-500 text-white px-3 py-1 md:px-4 md:py-2 rounded hover:bg-blue-600 font-bold text-sm md:text-base">
                         Login
                     </a>
                 </div>
             </div>
-            
-            <!-- Navegação de dias (visível apenas em mobile) -->
-            <div id="day-navigation" class="hidden md:hidden mb-2">
-                <button id="prev-day" class="bg-blue-500 text-white px-3 py-1 rounded-full">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <div id="current-day-display" class="font-bold text-lg"></div>
-                <button id="next-day" class="bg-blue-500 text-white px-3 py-1 rounded-full">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
+            <div class="md:hidden">
+                <!-- Navegação de dias (visível apenas em mobile) -->
+                <div id="day-navigation" class="mb-2">
+                    <button id="prev-day" class="bg-blue-500 text-white px-3 py-1 rounded-full">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div id="current-day-display" class="font-bold text-lg"></div>
+                    <button id="next-day" class="bg-blue-500 text-white px-3 py-1 rounded-full">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
             </div>
-            
             <div id="calendar" class="grid gap-2">
                 <!-- O calendário será gerado pelo JavaScript -->
             </div>
@@ -44,11 +46,11 @@
 
     <script>
         // Dados passados do servidor
-        const usuario = {{ usuario|tojson }};
-        const configuracoes = {{ configuracoes|tojson }};
-        const locaisTrabalho = {{ locais|tojson }};
-        const compromissos = {{ compromissos|tojson }};
-        
+        const usuario = {{ usuario| tojson }};
+        const configuracoes = {{ configuracoes| tojson }};
+        const locaisTrabalho = {{ locais| tojson }};
+        const compromissos = {{ compromissos| tojson }};
+
         // Nomes dos dias da semana
         const diasSemana = {
             0: 'Domingo',

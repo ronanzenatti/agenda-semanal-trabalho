@@ -140,3 +140,5 @@ window.excluirCompromisso = appointments.excluirCompromisso;
 window.navegarParaDiaAnterior = responsive.navegarParaDiaAnterior;
 window.navegarParaProximoDia = responsive.navegarParaProximoDia;
 window.closeMenu = responsive.fecharMenu;
+window.calculateDuration = appointments.calculateDuration;
+window.hideWorkplaceForm = workplaces.hideWorkplaceForm;

@@ -85,6 +85,8 @@ def agenda_publica(cpf):
         return render_template('erro.html', mensagem="Ocorreu um erro ao buscar os dados da agenda"), 500
 
 # Rotas de API para autenticação
+# No arquivo app.py, localize a função api_registrar e modifique o bloco try-except:
+
 @app.route('/auth/registrar', methods=['POST'])
 def api_registrar():
     dados = request.json
@@ -119,12 +121,21 @@ def api_registrar():
                 "hora_fim_padrao": "23:00"
             }).execute()
             
-            return jsonify({"sucesso": True, "mensagem": "Usuário registrado com sucesso"})
+            return jsonify({"sucesso": True, "mensagem": "Usuário registrado com sucesso, acesse seu e-mail para ativar a conta!"}), 201
         else:
             return jsonify({"sucesso": False, "mensagem": "Erro ao registrar usuário"}), 400
             
     except Exception as e:
-        return jsonify({"sucesso": False, "mensagem": str(e)}), 400
+        erro_str = str(e)
+        
+        # Verificar se é um erro de CPF duplicado
+        if "duplicate key value violates unique constraint" in erro_str and "usuarios_cpf_key" in erro_str:
+            return jsonify({"sucesso": False, "mensagem": "CPF já está cadastrado!"}), 400
+        # Verificar se é um erro de email duplicado
+        elif "duplicate key value violates unique constraint" in erro_str and "email" in erro_str:
+            return jsonify({"sucesso": False, "mensagem": "E-mail já está cadastrado!"}), 400
+        else:
+            return jsonify({"sucesso": False, "mensagem": "Erro ao registrar usuário: " + erro_str}), 400
 
 @app.route('/auth/login', methods=['POST'])
 def api_login():
