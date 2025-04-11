@@ -38,6 +38,52 @@ def login():
 def registrar():
     return render_template('registro.html')
 
+# Nova rota para visualização pública da agenda por CPF
+@app.route('/<cpf>')
+def agenda_publica(cpf):
+    try:
+        # Limpar formatação do CPF (remover pontos e traços)
+        cpf_limpo = cpf.replace('.', '').replace('-', '')
+        
+        # Buscar usuário pelo CPF
+        resposta_usuario = supabase_client.table('usuarios').select('*').eq('cpf', cpf_limpo).execute()
+        
+        if not resposta_usuario.data:
+            return render_template('erro.html', mensagem="Usuário não encontrado"), 404
+        
+        usuario = resposta_usuario.data[0]
+        usuario_id = usuario['id_usuario']
+        
+        # Buscar configurações do usuário
+        resposta_config = supabase_client.table('configuracoes_usuario').select('*').eq('usuario_id', usuario_id).execute()
+        
+        if resposta_config.data:
+            configuracoes = resposta_config.data[0]
+        else:
+            configuracoes = {
+                "dias_semana": [1, 2, 3, 4, 5, 6],
+                "hora_inicio_padrao": "07:00",
+                "hora_fim_padrao": "23:00"
+            }
+        
+        # Buscar locais de trabalho do usuário
+        resposta_locais = supabase_client.table('locais_trabalho').select('*').eq('usuario_id', usuario_id).execute()
+        
+        # Buscar compromissos do usuário
+        resposta_compromissos = supabase_client.table('compromissos').select('*').eq('usuario_id', usuario_id).execute()
+        
+        # Passar dados para o template
+        return render_template(
+            'agenda_publica.html',
+            usuario=usuario,
+            configuracoes=configuracoes,
+            locais=resposta_locais.data,
+            compromissos=resposta_compromissos.data
+        )
+    except Exception as e:
+        print(f"Erro ao buscar agenda pública: {str(e)}")
+        return render_template('erro.html', mensagem="Ocorreu um erro ao buscar os dados da agenda"), 500
+
 # Rotas de API para autenticação
 @app.route('/auth/registrar', methods=['POST'])
 def api_registrar():
