@@ -40,7 +40,7 @@ function verificarUsuario() {
     const cpf = sessionStorage.getItem('cpf');
     
     if (nome && cpf) {
-        document.getElementById('userDisplayName').textContent = `Usuário: ${nome} (${formatarCPF(cpf)})`;
+        document.getElementById('userDisplayName').innerHTML = `Usuário: <b class="text-blue-700">${nome} (${formatarCPF(cpf)})</b>`;
     } else {
         // Redirecionar para login se não estiver autenticado
         window.location.href = '/login';
