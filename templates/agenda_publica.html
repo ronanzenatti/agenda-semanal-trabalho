@@ -6,42 +6,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/styles.css">
     <title>Agenda de Trabalho</title>
-    <style>
-        .appointments-container {
-            position: relative;
-        }
-
-        .time-markers {
-            position: relative;
-        }
-        
-        .appointment {
-            position: absolute;
-            transition: all 0.2s;
-            overflow: hidden;
-            border-radius: 0.25rem;
-            z-index: 2;
-            color: white;
-        }
-    </style>
 </head>
 
 <body class="bg-gray-100 p-2">
-    <div class="mx-auto ">
+    <div class="mx-auto">
         <div class="bg-white rounded-lg shadow-lg p-3 mb-3">
             <div class="flex justify-between items-center mb-3">
                 <div class="flex flex-col">
-                    <h1 class="text-2xl font-bold">Agenda de Trabalho</h1>
-                    <span class="text-gray-600"><b>{{ usuario.nome }}</b> ({{ usuario.cpf }})</span>
+                    <h1 class="text-xl md:text-2xl font-bold">Agenda de Trabalho</h1>
+                    <span class="text-gray-600 text-sm md:text-base"><b>{{ usuario.nome }}</b> ({{ usuario.cpf }})</span>
                 </div>
                 <div>
-                    <a href="/login" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 font-bold">
+                    <a href="/login" class="bg-blue-500 text-white px-3 py-1 md:px-4 md:py-2 rounded hover:bg-blue-600 font-bold text-sm md:text-base">
                         Login
                     </a>
                 </div>
             </div>
-            <div id="calendar" class="grid gap-2 text-sm">
+            
+            <!-- Navegação de dias (visível apenas em mobile) -->
+            <div id="day-navigation" class="hidden md:hidden mb-2">
+                <button id="prev-day" class="bg-blue-500 text-white px-3 py-1 rounded-full">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div id="current-day-display" class="font-bold text-lg"></div>
+                <button id="next-day" class="bg-blue-500 text-white px-3 py-1 rounded-full">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            
+            <div id="calendar" class="grid gap-2">
                 <!-- O calendário será gerado pelo JavaScript -->
             </div>
         </div>
@@ -64,113 +59,8 @@
             5: 'Sexta',
             6: 'Sábado'
         };
-
-        // Inicialização
-        document.addEventListener('DOMContentLoaded', function() {
-            inicializarCalendario();
-            renderizarCompromissos();
-        });
-
-        // Inicializar o calendário
-        function inicializarCalendario() {
-            const calendar = document.getElementById('calendar');
-            calendar.innerHTML = '';
-            
-            // Filtrar dias da semana conforme configurações
-            const diasExibidos = Object.entries(diasSemana)
-                .filter(([dia]) => configuracoes.dias_semana.includes(parseInt(dia)))
-                .map(([dia, nome]) => ({ dia: parseInt(dia), nome }));
-            
-            // Definir grid-cols baseado no número de dias
-            calendar.className = `grid grid-cols-${diasExibidos.length} gap-2`;
-            
-            // Adicionar colunas dos dias
-            diasExibidos.forEach(({ dia, nome }) => {
-                const dayElement = document.createElement('div');
-                dayElement.className = 'border p-2 relative';
-                dayElement.innerHTML = `
-                    <h3 class="font-bold mb-2">${nome}</h3>
-                    <div id="day-${dia}" class="appointments-container relative" style="height: 960px;">
-                        ${gerarMarcadoresTempo()}
-                    </div>
-                `;
-                calendar.appendChild(dayElement);
-            });
-        }
-
-        // Gerar marcadores de tempo
-        function gerarMarcadoresTempo() {
-            let markers = '';
-            const horaInicio = parseInt(configuracoes.hora_inicio_padrao?.split(':')[0] || 7);
-            const horaFim = parseInt(configuracoes.hora_fim_padrao?.split(':')[0] || 23);
-            
-            for (let hora = horaInicio; hora <= horaFim; hora++) {
-                markers += `
-                    <div class="absolute w-full border-t border-gray-300" style="top: ${(hora - horaInicio) * 60}px;">
-                        <span class="absolute -mt-3 -ml-2 text-xs text-gray-500">${hora}h</span>
-                    </div>
-                `;
-                if (hora < horaFim) {
-                    markers += `
-                        <div class="absolute w-full border-t border-gray-300 border-dashed" style="top: ${(hora - horaInicio) * 60 + 30}px;">
-                        </div>
-                    `;
-                }
-            }
-            
-            return markers;
-        }
-
-        // Renderizar compromissos no calendário
-        function renderizarCompromissos() {
-            // Dias da semana para exibir
-            const diasSemanaExibidos = configuracoes.dias_semana || [1, 2, 3, 4, 5, 6];
-            
-            // Iterar sobre compromissos
-            compromissos.forEach(compromisso => {
-                const dayContainer = document.getElementById(`day-${compromisso.dia_semana}`);
-                if (!dayContainer) return; // Se o dia não estiver sendo exibido
-                
-                // Encontrar o local de trabalho correspondente
-                const local = locaisTrabalho.find(l => l.id_local === compromisso.local_id);
-                if (!local) return;
-                
-                const horaInicio = parseInt(configuracoes.hora_inicio_padrao?.split(':')[0] || 7);
-                const startMinutes = converterTempoParaMinutos(compromisso.hora_inicio);
-                const endMinutes = converterTempoParaMinutos(compromisso.hora_fim);
-                
-                // Calcular posição e altura
-                const topPosition = ((startMinutes - (horaInicio * 60)) / 60) * 60;
-                const height = ((endMinutes - startMinutes) / 60) * 60;
-                
-                // Criar elemento do compromisso
-                const appointmentElement = document.createElement('div');
-                appointmentElement.className = 'appointment absolute w-[95%] rounded text-white p-2';
-                appointmentElement.style.backgroundColor = local.cor;
-                appointmentElement.style.top = `${topPosition}px`;
-                appointmentElement.style.height = `${height}px`;
-                appointmentElement.style.marginLeft = "15px";
-                appointmentElement.style.border = "0.5px solid #fff";
-                
-                appointmentElement.innerHTML = `
-                    <div class="flex justify-between items-center text-sm">
-                        <strong>${local.nome} (${compromisso.duracao} ${compromisso.tipo_hora})</strong>
-                    </div>
-                    <div class="text-end font-bold">${compromisso.hora_inicio} - ${compromisso.hora_fim}</div> <hr>
-                    <div class="text-xs mt-3">${compromisso.descricao}</div>
-                `;
-                
-                dayContainer.appendChild(appointmentElement);
-            });
-        }
-
-        // Funções utilitárias
-        function converterTempoParaMinutos(tempo) {
-            if (!tempo) return 0;
-            const [horas, minutos] = tempo.split(':').map(Number);
-            return horas * 60 + minutos;
-        }
     </script>
+    <script src="/static/js/agenda_publica.js"></script>
 </body>
 
 </html>

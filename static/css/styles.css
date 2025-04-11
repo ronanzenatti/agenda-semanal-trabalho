@@ -96,13 +96,197 @@ button {
     opacity: 1;
 }
 
+/* Menu móvel */
+.mobile-menu {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 80%;
+    max-width: 300px;
+    background-color: white;
+    z-index: 1000;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    overflow-y: auto;
+}
+
+.mobile-menu.open {
+    transform: translateX(0);
+}
+
+.mobile-menu-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+.mobile-menu-overlay.active {
+    display: block;
+}
+
+/* Botão flutuante para adicionar compromisso em mobile */
+.floating-action-button {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: #10b981;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 90;
+    text-align: center;
+    line-height: 56px;
+    font-size: 24px;
+}
+
+/* Navegação entre dias para mobile */
+#day-navigation {
+    background-color: #f3f4f6;
+    border-radius: 8px;
+    padding: 8px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#current-day-display {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
 /* Responsividade */
 @media (max-width: 768px) {
-    .grid-cols-2, .grid-cols-3, .grid-cols-4 {
+    /* Layout geral */
+    .container {
+        padding: 0.5rem;
+    }
+    
+    /* Cabeçalho */
+    #desktop-buttons {
+        display: none;
+    }
+    
+    #mobile-menu-button {
+        display: block;
+    }
+    
+    /* Menu móvel */
+    .mobile-menu.open {
+        display: block;
+    }
+    
+    /* Ajuste de colunas para mobile */
+    .grid-cols-2, 
+    .grid-cols-3, 
+    .grid-cols-4,
+    .grid-cols-5,
+    .grid-cols-6,
+    .grid-cols-7 {
         grid-template-columns: 1fr;
     }
     
-    .calendar-day {
-        min-height: 150px;
+    /* Ajuste do texto nos cards */
+    .appointment {
+        font-size: 0.75rem;
+    }
+    
+    /* Mostrar FAB em mobile */
+    .floating-action-button {
+        display: block;
+    }
+    
+    /* Ajustes de modais para mobile */
+    .modal-content {
+        width: 95%;
+        padding: 1rem;
+        margin: 1rem auto;
+        max-height: 85vh;
+    }
+    
+    /* Ajustes de calendário para mobile */
+    .day-container {
+        margin-bottom: 1rem;
+    }
+    
+    /* Tornar os formulários mais compactos em mobile */
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Ajustar tamanho dos inputs */
+    input, select, textarea {
+        padding: 0.5rem;
+        font-size: 16px; /* Evitar zoom em iOS */
+    }
+    
+    /* Ajustar botões em mobile */
+    button {
+        padding: 0.5rem;
+    }
+    
+    /* Tornar cards de resumo mais compactos */
+    #workplaceSummaries > div {
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Ajuste de espaçamentos */
+    .p-4 {
+        padding: 0.75rem;
+    }
+    
+    .p-6 {
+        padding: 1rem;
+    }
+    
+    .gap-4 {
+        gap: 0.5rem;
+    }
+    
+    .mb-4 {
+        margin-bottom: 0.75rem;
+    }
+}
+
+/* Tablets */
+@media (min-width: 769px) and (max-width: 1024px) {
+    /* Ajustes para visualização em tablets */
+    .grid-cols-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    /* Reduzir número de colunas para 3 em tablets */
+    .md\:grid-cols-7,
+    .md\:grid-cols-6,
+    .md\:grid-cols-5,
+    .md\:grid-cols-4 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    /* Permitir scroll horizontal em tablets */
+    #calendar {
+        overflow-x: auto;
+    }
+    
+    /* Ajustar tamanho do texto */
+    .appointment {
+        font-size: 0.8rem;
+    }
+    
+    /* Ajustar espaçamentos */
+    .p-6 {
+        padding: 1.25rem;
     }
 }
