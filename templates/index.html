@@ -143,51 +143,55 @@
             <h2 class="text-xl font-bold mb-4">Configurações</h2>
             <form id="configForm">
                 <div class="mb-4">
-                    <label class="block mb-2">Dias da Semana para Exibir</label>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-                        <label class="inline-flex items-center">
-                            <input type="checkbox" name="daysToShow" value="1" class="mr-2" checked>
+                    <label class="block mb-2 font-bold">Dias da Semana para Exibir</label>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-1">
+                        <label class="inline-flex items-center justify-items-start">
+                            <input type="checkbox" name="daysToShow" value="1" class="mr-1" checked>
                             Segunda
                         </label>
-                        <label class="inline-flex items-center">
-                            <input type="checkbox" name="daysToShow" value="2" class="mr-2" checked>
+                        <label class="inline-flex items-center justify-items-start">
+                            <input type="checkbox" name="daysToShow" value="2" class="mr-1" checked>
                             Terça
                         </label>
-                        <label class="inline-flex items-center">
-                            <input type="checkbox" name="daysToShow" value="3" class="mr-2" checked>
+                        <label class="inline-flex items-center justify-items-start">
+                            <input type="checkbox" name="daysToShow" value="3" class="mr-1" checked>
                             Quarta
                         </label>
-                        <label class="inline-flex items-center">
-                            <input type="checkbox" name="daysToShow" value="4" class="mr-2" checked>
+                        <label class="inline-flex items-center justify-items-start">
+                            <input type="checkbox" name="daysToShow" value="4" class="mr-1" checked>
                             Quinta
                         </label>
-                        <label class="inline-flex items-center">
-                            <input type="checkbox" name="daysToShow" value="5" class="mr-2" checked>
+                        <label class="inline-flex items-center justify-items-start">
+                            <input type="checkbox" name="daysToShow" value="5" class="mr-1" checked>
                             Sexta
                         </label>
-                        <label class="inline-flex items-center">
-                            <input type="checkbox" name="daysToShow" value="6" class="mr-2" checked>
+                        <label class="inline-flex items-center justify-items-start">
+                            <input type="checkbox" name="daysToShow" value="6" class="mr-1" checked>
                             Sábado
                         </label>
-                        <label class="inline-flex items-center">
+                        <label class="inline-flex items-center justify-items-start">
                             <input type="checkbox" name="daysToShow" value="0" class="mr-2">
                             Domingo
                         </label>
                     </div>
                 </div>
-                <div class="mb-4">
-                    <label class="block mb-2">Horário Padrão de Início</label>
-                    <input type="time" id="defaultStartTime" class="w-full p-2 border rounded" value="07:00">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="mb-4">
+                        <label class="block mb-2 font-bold">Horário Padrão de Início</label>
+                        <input type="time" id="defaultStartTime" class="w-full p-2 border rounded text-center"
+                            value="07:00">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block mb-2 font-bold">Horário Padrão de Término</label>
+                        <input type="time" id="defaultEndTime" class="w-full p-2 border rounded text-center"
+                            value="23:00">
+                    </div>
                 </div>
-                <div class="mb-4">
-                    <label class="block mb-2">Horário Padrão de Término</label>
-                    <input type="time" id="defaultEndTime" class="w-full p-2 border rounded" value="23:00">
-                </div>
-                <div class="flex justify-end">
+                <div class="flex justify-between">
                     <button type="button" onclick="closeConfigModal()"
-                        class="ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancelar</button>
+                        class=" bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancelar</button>
                     <button type="submit"
-                        class="ml-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Salvar</button>
+                        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Salvar</button>
                 </div>
             </form>
         </div>
