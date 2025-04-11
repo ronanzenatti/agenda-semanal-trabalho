@@ -3,28 +3,28 @@
  */
 
 import { diasSemana, configuracoes, compromissos, locaisTrabalho } from './app.js';
-import { converterTempoParaMinutos } from './utils.js';
+import { converterTempoParaMinutos, formatarHora } from './utils.js';
 
 // Inicializar o calendário com suporte a responsividade
 export function inicializarCalendario() {
     const calendar = document.getElementById('calendar');
     if (!calendar) return;
-    
+
     calendar.innerHTML = '';
-    
+
     // Filtrar dias da semana conforme configurações
     const diasExibidos = Object.entries(diasSemana)
         .filter(([dia]) => configuracoes.diasSemana.includes(parseInt(dia)))
         .map(([dia, nome]) => ({ dia: parseInt(dia), nome }));
-    
+
     // Definir grid-cols baseado no número de dias
     calendar.className = `grid gap-2`;
-    
+
     // Adicionar classe para ajustar as colunas em telas maiores
     if (diasExibidos.length > 0) {
         calendar.classList.add(`md:grid-cols-${diasExibidos.length}`);
     }
-    
+
     // Adicionar colunas dos dias
     diasExibidos.forEach(({ dia, nome }) => {
         const dayElement = document.createElement('div');
@@ -45,7 +45,7 @@ export function gerarMarcadoresTempo() {
     let markers = '';
     const horaInicio = parseInt(configuracoes.horaInicioPadrao.split(':')[0]);
     const horaFim = parseInt(configuracoes.horaFimPadrao.split(':')[0]);
-    
+
     for (let hora = horaInicio; hora <= horaFim; hora++) {
         markers += `
             <div class="absolute w-full border-t border-gray-300" style="top: ${(hora - horaInicio) * 60}px;">
@@ -59,7 +59,7 @@ export function gerarMarcadoresTempo() {
             `;
         }
     }
-    
+
     return markers;
 }
 
@@ -72,24 +72,24 @@ export function renderizarCompromissos() {
             dayContainer.innerHTML = gerarMarcadoresTempo();
         }
     });
-    
+
     // Filtrar compromissos e ordená-los por hora de início
     compromissos.forEach(compromisso => {
         const dayContainer = document.getElementById(`day-${compromisso.dia_semana}`);
         if (!dayContainer) return; // Se o dia não estiver sendo exibido
-        
+
         // Encontrar o local de trabalho correspondente
         const local = locaisTrabalho.find(l => l.id_local === compromisso.local_id);
         if (!local) return;
-        
+
         const horaInicio = parseInt(configuracoes.horaInicioPadrao.split(':')[0]);
         const startMinutes = converterTempoParaMinutos(compromisso.hora_inicio);
         const endMinutes = converterTempoParaMinutos(compromisso.hora_fim);
-        
+
         // Calcular posição e altura
         const topPosition = ((startMinutes - (horaInicio * 60)) / 60) * 60;
         const height = ((endMinutes - startMinutes) / 60) * 60;
-        
+
         // Criar elemento do compromisso
         const appointmentElement = document.createElement('div');
         appointmentElement.className = 'appointment absolute w-[95%] rounded text-white p-2 cursor-pointer transition-all hover:shadow-lg';
@@ -98,7 +98,7 @@ export function renderizarCompromissos() {
         appointmentElement.style.height = `${height}px`;
         appointmentElement.style.marginLeft = "15px";
         appointmentElement.style.border = "0.5px solid #fff";
-        
+
         appointmentElement.innerHTML = `
             <div class="flex justify-between items-center">
                 <strong class="text-xs md:text-sm">${local.nome} (${compromisso.duracao} ${compromisso.tipo_hora})</strong>
@@ -111,11 +111,11 @@ export function renderizarCompromissos() {
                     </button>
                 </div>
             </div>
-            <div class="text-center font-bold text-xs md:text-sm">${compromisso.hora_inicio} - ${compromisso.hora_fim}</div> <hr>
+            <div class="text-center font-bold text-xs md:text-sm">${formatarHora(compromisso.hora_inicio)} - ${formatarHora(compromisso.hora_fim)}</div> <hr>
             <div class="text-xs mt-1 md:mt-3 hidden md:block">${compromisso.descricao}</div>
             <div class="text-xs mt-1 md:hidden">${compromisso.descricao.substring(0, 30)}${compromisso.descricao.length > 30 ? '...' : ''}</div>
         `;
-        
+
         dayContainer.appendChild(appointmentElement);
     });
 }

@@ -201,3 +201,4 @@ window.hideWorkplaceForm = workplaces.hideWorkplaceForm;
 window.shareCalendar = shareCalendar;
 window.closeShareModal = closeShareModal;
 window.copyShareLink = copyShareLink;
+window.formatarHora = utils.formatarHora;
