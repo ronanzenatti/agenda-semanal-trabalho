@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
     <title>Agenda de Trabalho</title>
 </head>
 
@@ -43,20 +44,25 @@
                         class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 font-bold text-sm md:text-base">
                         <i class="fas fa-question mr-2"></i>Ajuda
                     </button>
+                    <button onclick="shareCalendar(); closeMenu();"
+                        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-bold text-sm md:text-base">
+                        <i class="fas fa-share-alt mr-2"></i>Compartilhar
+                    </button>
                     <button onclick="logout()"
-                        class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 font-bold text-sm md:text-base">                        
+                        class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 font-bold text-sm md:text-base">
                         Sair<i class="fas fa-sign-out-alt ml-2"></i>
                     </button>
                 </div>
                 <!-- Botão de adicionar para mobile (fixo) -->
-                <button onclick="openAppointmentModal()" class="md:hidden bg-green-500 text-white p-2 rounded-full shadow-lg">
+                <button onclick="openAppointmentModal()"
+                    class="md:hidden bg-green-500 text-white p-2 rounded-full shadow-lg">
                     <i class="fas fa-plus"></i>
                 </button>
             </div>
-            
+
             <!-- Container de navegação entre dias (para mobile) -->
             <div id="day-navigation" class="hidden"></div>
-            
+
             <!-- Calendário -->
             <div id="calendar" class="grid gap-2"></div>
         </div>
@@ -66,7 +72,8 @@
                 <div class="p-4 rounded bg-gray-100">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-2">
                         <h3 class="font-bold text-lg md:text-xl mb-2 md:mb-0">Resumo por Local de Trabalho</h3>
-                        <select id="periodSelect" class="p-2 border rounded w-full md:w-auto" onchange="atualizarRelatorios()">
+                        <select id="periodSelect" class="p-2 border rounded w-full md:w-auto"
+                            onchange="atualizarRelatorios()">
                             <option value="week">Esta Semana</option>
                             <option value="month">Este Mês</option>
                         </select>
@@ -106,25 +113,25 @@
             </button>
         </div>
         <div class="flex flex-col space-y-4">
-            <button onclick="openWorkplaceModal(); closeMenu();" 
+            <button onclick="openWorkplaceModal(); closeMenu();"
                 class="bg-blue-500 text-white px-4 py-3 rounded hover:bg-blue-600 font-bold w-full text-left">
                 <i class="fas fa-building mr-2"></i>Locais de Trabalho
             </button>
-            <button onclick="openConfigModal(); closeMenu();" 
+            <button onclick="openConfigModal(); closeMenu();"
                 class="bg-purple-500 text-white px-4 py-3 rounded hover:bg-purple-600 font-bold w-full text-left">
                 <i class="fas fa-cog mr-2"></i>Configurações
             </button>
-            <button onclick="openAppointmentModal(); closeMenu();" 
+            <button onclick="openAppointmentModal(); closeMenu();"
                 class="bg-green-500 text-white px-4 py-3 rounded hover:bg-green-600 font-bold w-full text-left">
                 <i class="fas fa-calendar-plus mr-2"></i>Novo Compromisso
             </button>
-            <button onclick="openHelpModal(); closeMenu();" 
+            <button onclick="openHelpModal(); closeMenu();"
                 class="bg-yellow-500 text-white px-4 py-3 rounded hover:bg-yellow-600 font-bold w-full text-left">
                 <i class="fas fa-question-circle mr-2"></i>Ajuda
             </button>
             <hr class="my-2 border-gray-300">
-            <button onclick="logout()" 
-                class="bg-red-500 text-white px-4 py-3 rounded hover:bg-red-600 font-bold w-full text-left">                        
+            <button onclick="logout()"
+                class="bg-red-500 text-white px-4 py-3 rounded hover:bg-red-600 font-bold w-full text-left">
                 <i class="fas fa-sign-out-alt mr-2"></i>Sair
             </button>
         </div>
@@ -186,7 +193,6 @@
         </div>
     </div>
 
-    <!-- Os demais modais permanecem inalterados -->
     <!-- Modal Locais de Trabalho -->
     <div id="workplaceModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
         <div class="bg-white p-4 md:p-6 rounded-lg w-[95%] md:w-[800px] max-h-[90vh] overflow-y-auto">
@@ -322,13 +328,183 @@
 
     <!-- Modal de Ajuda -->
     <div id="helpModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white p-4 md:p-6 rounded-lg w-[95%] md:w-[1000px] max-h-[90vh] overflow-y-auto">
-            <!-- Conteúdo do modal de ajuda permanece inalterado -->
-            <!-- Fechar botão apenas foi ajustado para responsividade -->
+        <div class="bg-white p-6 rounded-lg w-[1000px] max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Ajuda - Agenda de Trabalho</h2>
+                <button onclick="closeHelpModal()" class="text-gray-600 hover:text-gray-800">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Visão Geral -->
+                <div>
+                    <h3 class="text-xl font-bold text-blue-600 mb-2">Visão Geral do Sistema</h3>
+                    <p class="mb-2">A Agenda de Trabalho é um sistema que permite organizar seus compromissos
+                        profissionais, calcular horas trabalhadas e valores a receber, adaptado às suas necessidades
+                        específicas.</p>
+                    <p>Este sistema foi desenvolvido para profissionais que atuam em múltiplos locais de trabalho e
+                        precisam gerenciar sua agenda de forma eficiente.</p>
+                </div>
+
+                <!-- Principais Funcionalidades -->
+                <div>
+                    <h3 class="text-xl font-bold text-blue-600 mb-2">Principais Funcionalidades</h3>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li><b>Gerenciamento de Locais de Trabalho:</b> Cadastre diferentes locais onde você trabalha,
+                            configurando cores, valores de hora e relacionamentos entre locais.</li>
+                        <li><b>Agenda Semanal:</b> Visualize e gerencie seus compromissos em uma agenda semanal
+                            intuitiva.</li>
+                        <li><b>Tipos de Hora:</b> Registre diferentes tipos de hora (HA - Hora Aula, HAE, HT - Hora
+                            Trabalho) conforme seu regime de contratação.</li>
+                        <li><b>Cálculos Automáticos:</b> O sistema calcula automaticamente os valores a receber por
+                            semana e por mês, considerando as configurações específicas de cada local.</li>
+                        <li><b>Configurações Personalizáveis:</b> Ajuste os dias da semana exibidos e o horário padrão
+                            de início e término do seu dia de trabalho.</li>
+                    </ul>
+                </div>
+
+                <!-- Como Utilizar -->
+                <div>
+                    <h3 class="text-xl font-bold text-blue-600 mb-2">Como Utilizar o Sistema</h3>
+
+                    <div class="mb-4">
+                        <h4 class="font-bold">1. Configurando Locais de Trabalho</h4>
+                        <p>Clique em "Locais de Trabalho" e depois em "Adicionar Local de Trabalho" para configurar:</p>
+                        <ul class="list-disc pl-6">
+                            <li>Nome do local</li>
+                            <li>Cor (para identificação visual na agenda)</li>
+                            <li>Valor por hora</li>
+                            <li>Acréscimo para hora-aula (em %)</li>
+                            <li>Período de carência (tempo mínimo entre compromissos em locais diferentes)</li>
+                            <li>Relacionamento entre locais (importante para controle do limite de 8h diárias)</li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-4">
+                        <h4 class="font-bold">2. Adicionando Compromissos</h4>
+                        <p>Clique em "Novo Compromisso" para adicionar um evento à sua agenda:</p>
+                        <ul class="list-disc pl-6">
+                            <li>Selecione o dia da semana</li>
+                            <li>Escolha o local de trabalho</li>
+                            <li>Defina o tipo de hora (HA, HAE ou HT)</li>
+                            <li>Configure o horário de início e término</li>
+                            <li>Adicione uma descrição do compromisso</li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-4">
+                        <h4 class="font-bold">3. Personalizando a Agenda</h4>
+                        <p>Clique em "Configurações" para personalizar sua experiência:</p>
+                        <ul class="list-disc pl-6">
+                            <li>Selecione quais dias da semana deseja exibir</li>
+                            <li>Ajuste o horário de início e término do seu dia de trabalho</li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-4">
+                        <h4 class="font-bold">4. Visualizando Relatórios</h4>
+                        <p>Na parte inferior da tela, você pode visualizar relatórios de horas trabalhadas e valores a
+                            receber:</p>
+                        <ul class="list-disc pl-6">
+                            <li>Resumo por local de trabalho</li>
+                            <li>Totais semanais</li>
+                            <li>Totais mensais (calculados com base em 4,5 semanas por mês)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Regras Trabalhistas -->
+                <div>
+                    <h3 class="text-xl font-bold text-blue-600 mb-2">Regras Trabalhistas Importantes</h3>
+
+                    <div class="mb-4">
+                        <h4 class="font-bold">Limite de Jornada Diária</h4>
+                        <p>O sistema aplica automaticamente a regra legal de limite de 8 horas diárias de trabalho para
+                            cada local ou grupo de locais relacionados. Esta é uma medida de proteção baseada na CLT
+                            (Consolidação das Leis do Trabalho).</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h4 class="font-bold">Período de Carência Entre Locais</h4>
+                        <p>É possível configurar um período mínimo entre compromissos em locais diferentes, garantindo
+                            tempo para deslocamento e descanso entre atividades.</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h4 class="font-bold">Diferenciação de Tipos de Hora</h4>
+                        <p>Conforme regulamentações específicas da sua categoria profissional:</p>
+                        <ul class="list-disc pl-6">
+                            <li><b>HA (Hora Aula):</b> Utilizada principalmente por professores, com possibilidade de
+                                acréscimo percentual.</li>
+                            <li><b>HAE:</b> Hora Atividade Específica, que pode ter valor diferenciado.</li>
+                            <li><b>HT (Hora Trabalho):</b> Utilizada para atividades administrativas ou outras sem
+                                acréscimo específico.</li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-4">
+                        <h4 class="font-bold">Cálculo de Remuneração</h4>
+                        <p>O sistema calcula a remuneração considerando:</p>
+                        <ul class="list-disc pl-6">
+                            <li>Valor base da hora de trabalho no local</li>
+                            <li>Acréscimos percentuais aplicáveis (para hora-aula)</li>
+                            <li>Duração dos compromissos</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Dicas e Boas Práticas -->
+                <div>
+                    <h3 class="text-xl font-bold text-blue-600 mb-2">Dicas e Boas Práticas</h3>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li>Utilize cores distintas para cada local de trabalho para facilitar a visualização da agenda.
+                        </li>
+                        <li>Configure corretamente os relacionamentos entre locais quando eles fazem parte da mesma
+                            instituição para controle adequado do limite de 8h.</li>
+                        <li>Revise periodicamente seus relatórios para verificar se há conflitos ou sobrecargas em sua
+                            agenda.</li>
+                        <li>Ao cadastrar compromissos recorrentes, verifique se há feriados ou outras exceções que
+                            precisam ser consideradas.</li>
+                        <li>Mantenha suas configurações de valor/hora atualizadas conforme reajustes salariais.</li>
+                    </ul>
+                </div>
+            </div>
+
             <div class="mt-6 text-center">
                 <button onclick="closeHelpModal()"
                     class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 font-bold">
                     Entendi
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="shareModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-4 md:p-6 rounded-lg w-[95%] md:w-[600px] max-h-[90vh] overflow-y-auto">
+            <h2 class="text-xl font-bold mb-4">Compartilhar Sua Agenda</h2>
+            <p class="mb-4">Compartilhe sua agenda semanal com outras pessoas através do link abaixo:</p>
+
+            <div class="flex items-center mb-6">
+                <input type="text" id="shareLink" class="flex-grow p-2 border rounded-l" readonly>
+                <button onclick="copyShareLink()"
+                    class="bg-blue-500 text-white p-2 rounded-r border-blue-500 hover:bg-blue-600">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+
+            <div class="flex items-center mb-6">
+                <div class="flex-grow">
+                    <p class="text-sm text-gray-600">O link permite que qualquer pessoa visualize sua agenda sem
+                        precisar fazer login.</p>
+                </div>
+            </div>
+
+            <div class="flex justify-between">
+                <button onclick="closeShareModal()"
+                    class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Fechar</button>
+                <button onclick="copyShareLink()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    <i class="fas fa-copy mr-2"></i>Copiar Link
                 </button>
             </div>
         </div>

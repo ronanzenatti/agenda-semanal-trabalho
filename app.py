@@ -45,6 +45,10 @@ def agenda_publica(cpf):
         # Limpar formatação do CPF (remover pontos e traços)
         cpf_limpo = cpf.replace('.', '').replace('-', '')
         
+        # Validar se o CPF tem 11 dígitos
+        if len(cpf_limpo) != 11 or not cpf_limpo.isdigit():
+            return render_template('erro.html', mensagem="CPF inválido. O formato correto é 000.000.000-00 ou 00000000000"), 400
+        
         # Buscar usuário pelo CPF
         resposta_usuario = supabase_client.table('usuarios').select('*').eq('cpf', cpf_limpo).execute()
         
@@ -53,6 +57,9 @@ def agenda_publica(cpf):
         
         usuario = resposta_usuario.data[0]
         usuario_id = usuario['id_usuario']
+        
+        # Formatar CPF para exibição (000.000.000-00)
+        usuario['cpf_formatado'] = f"{cpf_limpo[:3]}.{cpf_limpo[3:6]}.{cpf_limpo[6:9]}-{cpf_limpo[9:]}"
         
         # Buscar configurações do usuário
         resposta_config = supabase_client.table('configuracoes_usuario').select('*').eq('usuario_id', usuario_id).execute()
@@ -86,7 +93,6 @@ def agenda_publica(cpf):
 
 # Rotas de API para autenticação
 # No arquivo app.py, localize a função api_registrar e modifique o bloco try-except:
-
 @app.route('/auth/registrar', methods=['POST'])
 def api_registrar():
     dados = request.json

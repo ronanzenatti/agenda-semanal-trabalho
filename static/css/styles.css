@@ -1,301 +1,348 @@
 /* Estilos gerais */
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    line-height: 1.5;
-    color: #333;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  line-height: 1.5;
+  color: #333;
 }
 
 /* Calendário */
 .appointments-container {
-    position: relative;
-    background-color: #f9fafb;
-    border-radius: 0.25rem;
+  position: relative;
+  background-color: #f9fafb;
+  border-radius: 0.25rem;
 }
 
 /* Marcadores de tempo */
 .time-markers {
-    position: relative;
-    z-index: 1;
+  position: relative;
+  z-index: 1;
 }
 
 /* Compromissos */
 .appointment {
-    position: absolute;
-    transition: all 0.2s;
-    overflow: hidden;
-    border-radius: 0.25rem;
-    z-index: 2;
-    color: white;
+  position: absolute;
+  transition: all 0.2s;
+  overflow: hidden;
+  border-radius: 0.25rem;
+  z-index: 2;
+  color: white;
 }
 
 .appointment:hover {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
 }
 
 /* Modais - Ajustando z-index para evitar sobreposição incorreta */
 .modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 100;
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 100;
 }
 
 /* Z-index aumentado para todos os modais fixos */
-#configModal, 
-#workplaceModal, 
-#appointmentModal, 
+#configModal,
+#workplaceModal,
+#appointmentModal,
 #helpModal {
-    position: fixed;
-    z-index: 1000; /* Valor alto para garantir que fique acima de tudo */
+  position: fixed;
+  z-index: 1000; /* Valor alto para garantir que fique acima de tudo */
 }
 
 .modal-content {
-    background-color: white;
-    border-radius: 0.5rem;
-    padding: 1.5rem;
-    width: 90%;
-    max-width: 600px;
-    margin: 2rem auto;
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 600px;
+  margin: 2rem auto;
 }
 
 /* Formulários */
-input, select, textarea {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 0.25rem;
-    margin-bottom: 1rem;
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.25rem;
+  margin-bottom: 1rem;
 }
 
 button {
-    cursor: pointer;
-    transition: background-color 0.2s;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 /* Tooltip para fornecer informações adicionais ao passar o mouse */
 .tooltip {
-    position: relative;
-    display: inline-block;
+  position: relative;
+  display: inline-block;
 }
 
 .tooltip .tooltip-text {
-    visibility: hidden;
-    width: 200px;
-    background-color: #333;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px;
-    position: absolute;
-    z-index: 1;
-    bottom: 125%;
-    left: 50%;
-    margin-left: -100px;
-    opacity: 0;
-    transition: opacity 0.3s;
+  visibility: hidden;
+  width: 200px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -100px;
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
 .tooltip:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
+  visibility: visible;
+  opacity: 1;
 }
 
 /* Menu móvel - ajustado para ter z-index alto, mas menor que os modais */
 .mobile-menu {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: 80%;
-    max-width: 300px;
-    background-color: white;
-    z-index: 900;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-    overflow-y: auto;
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 80%;
+  max-width: 300px;
+  background-color: white;
+  z-index: 900;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  overflow-y: auto;
 }
 
 .mobile-menu.open {
-    transform: translateX(0);
+  transform: translateX(0);
 }
 
 .mobile-menu-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 899;
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 899;
 }
 
 .mobile-menu-overlay.active {
-    display: block;
+  display: block;
 }
 
 /* Botão flutuante para adicionar compromisso em mobile */
 .floating-action-button {
-    display: none;
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background-color: #10b981;
-    color: white;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 90;
-    text-align: center;
-    line-height: 56px;
-    font-size: 24px;
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: #10b981;
+  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 90;
+  text-align: center;
+  line-height: 56px;
+  font-size: 24px;
 }
 
 /* Navegação entre dias para mobile */
 #day-navigation {
-    background-color: #f3f4f6;
-    border-radius: 8px;
-    padding: 8px;
-    margin-bottom: 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  background-color: #f3f4f6;
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 #current-day-display {
-    font-weight: bold;
-    font-size: 1.1rem;
+  font-weight: bold;
+  font-size: 1.1rem;
 }
 
 /* Responsividade */
 @media (max-width: 768px) {
-    /* Layout geral */
-    .container {
-        padding: 0.5rem;
-    }
-    
-    /* Cabeçalho */
-    #desktop-buttons {
-        display: none;
-    }
-    
-    #mobile-menu-button {
-        display: block;
-    }
-    
-    /* Menu móvel */
-    .mobile-menu.open {
-        display: block;
-    }
-    
-    /* Ajuste de colunas para mobile */
-    .grid-cols-2, 
-    .grid-cols-3, 
-    .grid-cols-4,
-    .grid-cols-5,
-    .grid-cols-6,
-    .grid-cols-7 {
-        grid-template-columns: 1fr;
-    }
-    
-    /* Ajuste do texto nos cards */
-    .appointment {
-        font-size: 0.75rem;
-    }
-    
-    /* Mostrar FAB em mobile */
-    .floating-action-button {
-        display: block;
-    }
-    
-    /* Ajustes de modais para mobile */
-    .modal-content {
-        width: 95%;
-        padding: 1rem;
-        margin: 1rem auto;
-        max-height: 85vh;
-    }
-    
-    /* Ajustes de calendário para mobile */
-    .day-container {
-        margin-bottom: 1rem;
-    }
-    
-    /* Tornar os formulários mais compactos em mobile */
-    .form-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    /* Ajustar tamanho dos inputs */
-    input, select, textarea {
-        padding: 0.5rem;
-        font-size: 16px; /* Evitar zoom em iOS */
-    }
-    
-    /* Ajustar botões em mobile */
-    button {
-        padding: 0.5rem;
-    }
-    
-    /* Tornar cards de resumo mais compactos */
-    #workplaceSummaries > div {
-        padding: 0.75rem;
-        margin-bottom: 0.5rem;
-    }
-    
-    /* Ajuste de espaçamentos */
-    .p-4 {
-        padding: 0.75rem;
-    }
-    
-    .p-6 {
-        padding: 1rem;
-    }
-    
-    .gap-4 {
-        gap: 0.5rem;
-    }
-    
-    .mb-4 {
-        margin-bottom: 0.75rem;
-    }
+  /* Layout geral */
+  .container {
+    padding: 0.5rem;
+  }
+
+  /* Cabeçalho */
+  #desktop-buttons {
+    display: none;
+  }
+
+  #mobile-menu-button {
+    display: block;
+  }
+
+  /* Menu móvel */
+  .mobile-menu.open {
+    display: block;
+  }
+
+  /* Ajuste de colunas para mobile */
+  .grid-cols-2,
+  .grid-cols-3,
+  .grid-cols-4,
+  .grid-cols-5,
+  .grid-cols-6,
+  .grid-cols-7 {
+    grid-template-columns: 1fr;
+  }
+
+  /* Ajuste do texto nos cards */
+  .appointment {
+    font-size: 0.75rem;
+  }
+
+  /* Mostrar FAB em mobile */
+  .floating-action-button {
+    display: block;
+  }
+
+  /* Ajustes de modais para mobile */
+  .modal-content {
+    width: 95%;
+    padding: 1rem;
+    margin: 1rem auto;
+    max-height: 85vh;
+  }
+
+  /* Ajustes de calendário para mobile */
+  .day-container {
+    margin-bottom: 1rem;
+  }
+
+  /* Tornar os formulários mais compactos em mobile */
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Ajustar tamanho dos inputs */
+  input,
+  select,
+  textarea {
+    padding: 0.5rem;
+    font-size: 16px; /* Evitar zoom em iOS */
+  }
+
+  /* Ajustar botões em mobile */
+  button {
+    padding: 0.5rem;
+  }
+
+  /* Tornar cards de resumo mais compactos */
+  #workplaceSummaries > div {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Ajuste de espaçamentos */
+  .p-4 {
+    padding: 0.75rem;
+  }
+
+  .p-6 {
+    padding: 1rem;
+  }
+
+  .gap-4 {
+    gap: 0.5rem;
+  }
+
+  .mb-4 {
+    margin-bottom: 0.75rem;
+  }
 }
 
 /* Tablets */
 @media (min-width: 769px) and (max-width: 1024px) {
-    /* Ajustes para visualização em tablets */
-    .grid-cols-4 {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    /* Reduzir número de colunas para 3 em tablets */
-    .md\:grid-cols-7,
-    .md\:grid-cols-6,
-    .md\:grid-cols-5,
-    .md\:grid-cols-4 {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    
-    /* Permitir scroll horizontal em tablets */
-    #calendar {
-        overflow-x: auto;
-    }
-    
-    /* Ajustar tamanho do texto */
-    .appointment {
-        font-size: 0.8rem;
-    }
-    
-    /* Ajustar espaçamentos */
-    .p-6 {
-        padding: 1.25rem;
-    }
+  /* Ajustes para visualização em tablets */
+  .grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Reduzir número de colunas para 3 em tablets */
+  .md\:grid-cols-7,
+  .md\:grid-cols-6,
+  .md\:grid-cols-5,
+  .md\:grid-cols-4 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Permitir scroll horizontal em tablets */
+  #calendar {
+    overflow-x: auto;
+  }
+
+  /* Ajustar tamanho do texto */
+  .appointment {
+    font-size: 0.8rem;
+  }
+
+  /* Ajustar espaçamentos */
+  .p-6 {
+    padding: 1.25rem;
+  }
+}
+
+/* Adicionar ao arquivo static/css/styles.css */
+
+/* Estilo para o botão de compartilhamento */
+.share-button {
+  transition: all 0.2s ease;
+}
+
+.share-button:hover {
+  transform: scale(1.05);
+}
+
+/* Estilo para o modal de compartilhamento */
+#shareModal input[readonly] {
+  background-color: #f8f9fa;
+  cursor: default;
+}
+
+#shareModal .copy-button {
+  transition: all 0.2s ease;
+}
+
+#shareModal .copy-button:hover {
+  transform: scale(1.05);
+}
+
+/* Responsividade para o modal de compartilhamento */
+@media (max-width: 768px) {
+  #shareModal .flex {
+    flex-direction: column;
+  }
+
+  #shareModal button {
+    margin-top: 8px;
+  }
+
+  #shareModal .copy-button {
+    width: 100%;
+    margin-top: 8px;
+    padding: 10px;
+  }
 }

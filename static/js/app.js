@@ -34,19 +34,19 @@ export const diasSemana = {
 };
 
 // Inicialização
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Verificar usuário
     auth.verificarUsuario();
-    
+
     // Inicializar o menu móvel
     responsive.inicializarMenuMobile();
-    
+
     // Inicializar listeners dos formulários
     inicializarEventListeners();
-    
+
     // Carregar dados iniciais
     carregarDados();
-    
+
     // Adicionar listener para redimensionamento da janela
     window.addEventListener('resize', responsive.verificarResponsividade);
 });
@@ -55,14 +55,14 @@ document.addEventListener('DOMContentLoaded', function() {
 function inicializarEventListeners() {
     // Formulário de configurações
     document.getElementById('configForm')?.addEventListener('submit', config.salvarConfiguracoes);
-    
+
     // Formulário de locais de trabalho
     document.getElementById('newWorkplaceForm')?.addEventListener('submit', workplaces.salvarLocalTrabalho);
     document.getElementById('addWorkplaceBtn')?.addEventListener('click', workplaces.mostrarFormularioLocalTrabalho);
-    
+
     // Formulário de compromissos
     document.getElementById('appointmentForm')?.addEventListener('submit', appointments.salvarCompromisso);
-    
+
     // Listener para atualização de relatórios
     document.getElementById('periodSelect')?.addEventListener('change', reports.atualizarRelatorios);
 }
@@ -74,7 +74,7 @@ function carregarDados() {
         .then(() => {
             // Inicializar calendário após carregar configurações
             calendar.inicializarCalendario();
-            
+
             // Carregar locais de trabalho
             return workplaces.carregarLocaisTrabalho();
         })
@@ -85,12 +85,12 @@ function carregarDados() {
         .then(() => {
             // Renderizar compromissos
             calendar.renderizarCompromissos();
-            
+
             // Verificar se é mobile para ajustar visualização
             if (window.innerWidth <= 768) {
                 responsive.ajustarVisualizacaoParaMobile();
             }
-            
+
             // Atualizar relatórios
             reports.atualizarRelatorios();
         })
@@ -106,7 +106,7 @@ function carregarDados() {
 
 // Atualizar dados globais (usado pelos módulos para atualizar o estado global)
 export function atualizarDadosGlobais(tipo, dados) {
-    switch(tipo) {
+    switch (tipo) {
         case 'compromissos':
             compromissos = dados;
             break;
@@ -119,6 +119,62 @@ export function atualizarDadosGlobais(tipo, dados) {
     }
 }
 
+// Função para abrir o modal de compartilhamento
+function shareCalendar() {
+    const cpf = sessionStorage.getItem('cpf');
+    if (!cpf) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: 'Não foi possível obter seu CPF para compartilhamento.'
+        });
+        return;
+    }
+
+    // Criar o link de compartilhamento
+    const shareLink = `${window.location.origin}/${cpf}`;
+    document.getElementById('shareLink').value = shareLink;
+
+    // Abrir o modal
+    document.getElementById('shareModal').classList.remove('hidden');
+}
+
+// Função para fechar o modal de compartilhamento
+function closeShareModal() {
+    document.getElementById('shareModal').classList.add('hidden');
+}
+
+// Função para copiar o link para a área de transferência
+function copyShareLink() {
+    const linkInput = document.getElementById('shareLink');
+    linkInput.select();
+    linkInput.setSelectionRange(0, 99999); // Para dispositivos móveis
+
+    navigator.clipboard.writeText(linkInput.value)
+        .then(() => {
+            // Feedback visual para o usuário
+            Swal.fire({
+                icon: 'success',
+                title: 'Link Copiado!',
+                text: 'O link foi copiado para a área de transferência.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        })
+        .catch(err => {
+            console.error('Erro ao copiar o link:', err);
+            // Fallback para método antigo
+            document.execCommand('copy');
+            Swal.fire({
+                icon: 'success',
+                title: 'Link Copiado!',
+                text: 'O link foi copiado para a área de transferência.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        });
+}
+
 // Expor funções para uso global/janela
 window.openWorkplaceModal = workplaces.openWorkplaceModal;
 window.closeWorkplaceModal = workplaces.closeWorkplaceModal;
@@ -126,10 +182,10 @@ window.openAppointmentModal = appointments.openAppointmentModal;
 window.closeAppointmentModal = appointments.closeAppointmentModal;
 window.openConfigModal = config.openConfigModal;
 window.closeConfigModal = config.closeConfigModal;
-window.openHelpModal = function() {
+window.openHelpModal = function () {
     document.getElementById('helpModal').classList.remove('hidden');
 };
-window.closeHelpModal = function() {
+window.closeHelpModal = function () {
     document.getElementById('helpModal').classList.add('hidden');
 };
 window.logout = auth.logout;
@@ -142,3 +198,6 @@ window.navegarParaProximoDia = responsive.navegarParaProximoDia;
 window.closeMenu = responsive.fecharMenu;
 window.calculateDuration = appointments.calculateDuration;
 window.hideWorkplaceForm = workplaces.hideWorkplaceForm;
+window.shareCalendar = shareCalendar;
+window.closeShareModal = closeShareModal;
+window.copyShareLink = copyShareLink;
