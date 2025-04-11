@@ -327,8 +327,8 @@ function renderizarCompromissos() {
                     </button>
                 </div>
             </div>
-            <div>${compromisso.hora_inicio} - ${compromisso.hora_fim}</div>
-            <div class="text-sm">${compromisso.descricao}</div>
+            <div>${compromisso.hora_inicio} - ${compromisso.hora_fim}</div> <hr>
+            <div class="text-sm mt-3">${compromisso.descricao}</div>
         `;
         
         dayContainer.appendChild(appointmentElement);

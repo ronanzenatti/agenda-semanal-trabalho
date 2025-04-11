@@ -3,12 +3,16 @@ from functools import wraps
 import os
 from dotenv import load_dotenv
 from supabase_client import supabase_client
+from datetime import timedelta
 
 # Carregar variáveis de ambiente
 load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "chave-secreta-temporaria")
+
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)  # Sessão válida por 24 horas
 
 # Middleware para verificar autenticação
 def requer_autenticacao(f):
@@ -103,6 +107,9 @@ def api_login():
                 session['nome'] = usuario['nome']
                 session['cpf'] = usuario['cpf']
                 
+                # Para debugging
+                print(f"Sessão criada: {session}")
+                
                 return jsonify({
                     "sucesso": True, 
                     "usuario": {
@@ -117,7 +124,8 @@ def api_login():
             return jsonify({"sucesso": False, "mensagem": "Credenciais inválidas"}), 401
             
     except Exception as e:
-        return jsonify({"sucesso": False, "mensagem": str(e)}), 400
+        print(f"Erro no login: {str(e)}")
+        return jsonify({"sucesso": False, "mensagem": str(e)}), 400 
 
 @app.route('/auth/logout', methods=['POST'])
 def api_logout():
@@ -480,15 +488,15 @@ def relatorio_mensal():
                     "locais": [
                         {
                             "nome": local["nome"],
-                            "base_horas": local["base_horas"] * 4,
-                            "acrescimo_horas": local["acrescimo_horas"] * 4,
-                            "total_horas": local["total_horas"] * 4,
-                            "valor_total": local["valor_total"] * 4
+                            "base_horas": local["base_horas"] * 4.5,
+                            "acrescimo_horas": local["acrescimo_horas"] * 4.5,
+                            "total_horas": local["total_horas"] * 4.5,
+                            "valor_total": local["valor_total"] * 4.5
                         }
                         for local in relatorio["locais"]
                     ],
-                    "total_horas": relatorio["total_horas"] * 4,
-                    "total_valor": relatorio["total_valor"] * 4
+                    "total_horas": relatorio["total_horas"] * 4.5,
+                    "total_valor": relatorio["total_valor"] * 4.5
                 }
             })
         else:

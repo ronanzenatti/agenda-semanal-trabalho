@@ -103,6 +103,17 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.sucesso) {
+                        // Adicionar dados ao sessionStorage
+                        sessionStorage.setItem('usuario_id', data.usuario.id);
+                        sessionStorage.setItem('nome', data.usuario.nome);
+                        sessionStorage.setItem('cpf', data.usuario.cpf);
+                        
+                        console.log('Dados salvos na sessão:', {
+                            id: data.usuario.id,
+                            nome: data.usuario.nome,
+                            cpf: data.usuario.cpf
+                        });
+                        
                         window.location.href = '/';
                     } else {
                         Swal.fire({
@@ -113,6 +124,7 @@
                     }
                 })
                 .catch(error => {
+                    console.error('Erro na requisição:', error);
                     Swal.fire({
                         icon: 'error',
                         title: 'Erro',
@@ -179,6 +191,7 @@
                     }
                 })
                 .catch(error => {
+                    console.error('Erro na requisição:', error);
                     Swal.fire({
                         icon: 'error',
                         title: 'Erro',
