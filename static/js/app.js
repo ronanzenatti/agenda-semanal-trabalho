@@ -12,6 +12,7 @@ import * as config from './config.js';
 import * as reports from './reports.js';
 import * as responsive from './responsive.js';
 import * as utils from './utils.js';
+import { initSchedules, getActiveScheduleId, getActiveSchedule } from './schedules.js';
 
 // Variáveis Globais compartilhadas entre módulos - exportadas para acesso em outros arquivos
 export let compromissos = [];
@@ -72,14 +73,17 @@ function carregarDados() {
     // Carregar configurações do usuário
     config.carregarConfiguracoes()
         .then(() => {
-            // Inicializar calendário após carregar configurações
-            calendar.inicializarCalendario();
-
+            // Inicializar UI de Agendas
+            if (document.getElementById('activeScheduleSelector')) {
+                return initSchedules();
+            }
+        })
+        .then(() => {
             // Carregar locais de trabalho
             return workplaces.carregarLocaisTrabalho();
         })
         .then(() => {
-            // Carregar compromissos
+            // Carregar compromissos (agora baseado na agenda ativa)
             return appointments.carregarCompromissos();
         })
         .then(() => {
@@ -121,22 +125,44 @@ export function atualizarDadosGlobais(tipo, dados) {
 
 // Função para abrir o modal de compartilhamento
 function shareCalendar() {
-    const cpf = sessionStorage.getItem('cpf');
-    if (!cpf) {
+    const agendaId = getActiveScheduleId();
+    
+    if (!agendaId) {
         Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: 'Não foi possível obter seu CPF para compartilhamento.'
+            icon: 'warning',
+            title: 'Atenção',
+            text: 'Selecione uma agenda antes de compartilhar.'
         });
         return;
     }
-
-    // Criar o link de compartilhamento
-    const shareLink = `${window.location.origin}/${cpf}`;
-    document.getElementById('shareLink').value = shareLink;
-
-    // Abrir o modal
-    document.getElementById('shareModal').classList.remove('hidden');
+    
+    // Obter link público da agenda
+    fetch(`/agendas/${agendaId}/public_link`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.sucesso && data.link_publico_id) {
+                // Criar o link de compartilhamento
+                const shareLink = `${window.location.origin}/public/agenda/${data.link_publico_id}`;
+                document.getElementById('shareLink').value = shareLink;
+                
+                // Abrir o modal
+                document.getElementById('shareModal').classList.remove('hidden');
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: 'Não foi possível obter o link de compartilhamento.'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao obter link de compartilhamento:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: 'Falha ao gerar link de compartilhamento.'
+            });
+        });
 }
 
 // Função para fechar o modal de compartilhamento

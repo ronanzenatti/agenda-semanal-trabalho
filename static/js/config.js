@@ -5,9 +5,11 @@
 import { atualizarDadosGlobais, configuracoes } from './app.js';
 import { inicializarCalendario, renderizarCompromissos } from './calendar.js';
 import { verificarResponsividade } from './responsive.js';
+import { getActiveScheduleId } from './schedules.js';
 
 // Carregar configurações do usuário
 export function carregarConfiguracoes() {
+    // Por padrão, usar configurações gerais do usuário
     return fetch('/configuracoes')
         .then(response => response.json())
         .then(data => {
@@ -23,7 +25,35 @@ export function carregarConfiguracoes() {
                 // Atualizar interface com as configurações
                 atualizarInterfaceConfiguracoes();
             }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar configurações:', error);
+            // Usar configurações padrão em caso de erro
+            const configPadrao = {
+                diasSemana: [1, 2, 3, 4, 5, 6],
+                horaInicioPadrao: '07:00',
+                horaFimPadrao: '23:00'
+            };
+            atualizarDadosGlobais('configuracoes', configPadrao);
         });
+}
+
+// Carregar configurações da agenda ativa (sobrescreve as gerais)
+export function carregarConfiguracoesAgenda(agenda) {
+    if (!agenda) return;
+    
+    const novasConfig = {
+        diasSemana: agenda.dias_semana || [1, 2, 3, 4, 5],
+        horaInicioPadrao: agenda.hora_inicio_padrao || '07:00',
+        horaFimPadrao: agenda.hora_fim_padrao || '23:00'
+    };
+    
+    atualizarDadosGlobais('configuracoes', novasConfig);
+    atualizarInterfaceConfiguracoes();
+    
+    // Reinicializar calendário com as novas configurações
+    inicializarCalendario();
+    renderizarCompromissos();
 }
 
 // Atualizar interface com as configurações
@@ -44,6 +74,20 @@ export function atualizarInterfaceConfiguracoes() {
 
 // Abrir modal de configurações
 export function openConfigModal() {
+    const agendaId = getActiveScheduleId();
+    
+    if (agendaId) {
+        // Se há agenda ativa, mostrar aviso
+        Swal.fire({
+            icon: 'info',
+            title: 'Atenção',
+            text: 'As configurações de calendário devem ser feitas diretamente na agenda ativa. Use o botão "Meus Horários" e depois "Configurar" na agenda desejada.',
+            confirmButtonText: 'Entendi'
+        });
+        return;
+    }
+    
+    // Se não há agenda ativa, permitir configurações gerais
     atualizarInterfaceConfiguracoes();
     document.getElementById('configModal').classList.remove('hidden');
 }
@@ -56,6 +100,19 @@ export function closeConfigModal() {
 // Salvar configurações
 export function salvarConfiguracoes(e) {
     e.preventDefault();
+    
+    // Verificar se há agenda ativa
+    const agendaId = getActiveScheduleId();
+    if (agendaId) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Atenção',
+            text: 'Você tem uma agenda ativa. As configurações devem ser salvas na agenda.',
+            confirmButtonText: 'OK'
+        });
+        closeConfigModal();
+        return;
+    }
     
     // Obter dias da semana selecionados
     const checkboxes = document.querySelectorAll('input[name="daysToShow"]:checked');

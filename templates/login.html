@@ -118,11 +118,28 @@
                         
                         window.location.href = '/';
                     } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Erro',
-                            text: data.mensagem || 'Erro ao fazer login'
-                        });
+                        const mensagemErro = data.mensagem || 'Erro ao fazer login';
+                        // Verificar se a mensagem de erro indica e-mail não confirmado
+                        // Ajuste estas strings conforme as mensagens reais do seu backend/Supabase
+                        const isEmailUnconfirmed = mensagemErro.toLowerCase().includes('email not confirmed') ||
+                                                   mensagemErro.toLowerCase().includes('user not confirmed') ||
+                                                   mensagemErro.toLowerCase().includes('confirme seu e-mail') ||
+                                                   mensagemErro.toLowerCase().includes('email precisa ser confirmado');
+
+                        if (isEmailUnconfirmed) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Email Não Confirmado',
+                                text: 'Seu email ainda não foi confirmado. Por favor, verifique sua caixa de entrada (e pasta de spam) para o link de ativação antes de tentar fazer login.',
+                                confirmButtonText: 'Entendi'
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro',
+                                text: mensagemErro
+                            });
+                        }
                     }
                 })
                 .catch(error => {
