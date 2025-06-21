@@ -200,11 +200,6 @@ function mostrarSeletorAgendaParaCompartilhar(agendas) {
     });
 }
 
-// Função para fechar o modal de compartilhamento
-function closeShareModal() {
-    document.getElementById('shareModal').classList.add('hidden');
-}
-
 // Função para copiar o link para a área de transferência
 function copyShareLink() {
     const linkInput = document.getElementById('shareLink');
