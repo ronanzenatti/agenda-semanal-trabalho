@@ -96,12 +96,12 @@ function carregarDados() {
             const agendaId = getActiveScheduleId();
             if (agendaId) {
                 calendar.renderizarCompromissos();
-                
+
                 // Verificar se é mobile para ajustar visualização
                 if (window.innerWidth <= 768) {
                     responsive.ajustarVisualizacaoParaMobile();
                 }
-                
+
                 // Atualizar relatórios
                 reports.atualizarRelatorios();
             }
@@ -134,7 +134,7 @@ export function atualizarDadosGlobais(tipo, dados) {
 // Função para abrir o modal de compartilhamento
 function shareCalendar() {
     const agendaId = getActiveScheduleId();
-    
+
     if (!agendaId) {
         Swal.fire({
             icon: 'warning',
@@ -143,7 +143,7 @@ function shareCalendar() {
         });
         return;
     }
-    
+
     // Obter link público da agenda
     fetch(`/agendas/${agendaId}/public_link`)
         .then(response => response.json())
@@ -152,7 +152,7 @@ function shareCalendar() {
                 // Criar o link de compartilhamento
                 const shareLink = `${window.location.origin}/public/agenda/${data.link_publico_id}`;
                 document.getElementById('shareLink').value = shareLink;
-                
+
                 // Abrir o modal
                 document.getElementById('shareModal').classList.remove('hidden');
             } else {

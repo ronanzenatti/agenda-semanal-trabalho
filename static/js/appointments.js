@@ -11,13 +11,13 @@ import { getActiveScheduleId } from './schedules.js';
 // Carregar compromissos do servidor
 export function carregarCompromissos() {
     const agendaId = getActiveScheduleId();
-    
+
     if (!agendaId) {
         // Se não há agenda ativa, limpar compromissos
         atualizarDadosGlobais('compromissos', []);
         return Promise.resolve();
     }
-    
+
     return fetch(`/agendas/${agendaId}/compromissos`)
         .then(response => response.json())
         .then(data => {
@@ -43,11 +43,11 @@ export function openAppointmentModal(idCompromisso = null) {
         });
         return;
     }
-    
+
     // Resetar formulário
     document.getElementById('appointmentForm').reset();
     document.getElementById('editingId').value = '';
-    
+
     if (idCompromisso) {
         const compromisso = compromissos.find(c => c.id_compromisso === idCompromisso);
         if (compromisso) {
@@ -64,7 +64,7 @@ export function openAppointmentModal(idCompromisso = null) {
     } else {
         document.getElementById('appointmentFormTitle').textContent = 'Novo Compromisso';
     }
-    
+
     document.getElementById('appointmentModal').classList.remove('hidden');
 }
 
@@ -82,10 +82,10 @@ export function calculateDuration() {
         const start = converterTempoParaMinutos(startTime);
         const end = converterTempoParaMinutos(endTime);
         let duration = (end - start) / 60;
-        
+
         // Arredondar para 0.5 mais próximo
         duration = Math.round(duration * 2) / 2;
-        
+
         document.getElementById('duration').value = duration.toFixed(1);
     }
 }
@@ -93,7 +93,7 @@ export function calculateDuration() {
 // Salvar compromisso
 export function salvarCompromisso(e) {
     e.preventDefault();
-    
+
     const agendaId = getActiveScheduleId();
     if (!agendaId) {
         Swal.fire({
@@ -103,7 +103,7 @@ export function salvarCompromisso(e) {
         });
         return;
     }
-    
+
     const idCompromisso = document.getElementById('editingId').value;
     const diaSemana = parseInt(document.getElementById('dayOfWeek').value);
     const localId = document.getElementById('workplace').value;
@@ -112,7 +112,7 @@ export function salvarCompromisso(e) {
     const description = document.getElementById('description').value;
     const hourType = document.querySelector('input[name="hourType"]:checked').value;
     const duration = parseFloat(document.getElementById('duration').value);
-    
+
     // Validações básicas
     if (!localId) {
         Swal.fire({
@@ -122,7 +122,7 @@ export function salvarCompromisso(e) {
         });
         return;
     }
-    
+
     // Verificar se a duração é positiva
     if (duration <= 0) {
         Swal.fire({
@@ -132,7 +132,7 @@ export function salvarCompromisso(e) {
         });
         return;
     }
-    
+
     // Preparar dados para envio
     const dados = {
         local_id: localId,
@@ -143,13 +143,13 @@ export function salvarCompromisso(e) {
         tipo_hora: hourType,
         duracao: duration
     };
-    
+
     // Método e URL baseados em ser novo ou edição
     const metodo = idCompromisso ? 'PUT' : 'POST';
-    const url = idCompromisso ? 
-        `/agendas/${agendaId}/compromissos/${idCompromisso}` : 
+    const url = idCompromisso ?
+        `/agendas/${agendaId}/compromissos/${idCompromisso}` :
         `/agendas/${agendaId}/compromissos`;
-    
+
     // Mostrar loading
     Swal.fire({
         title: 'Salvando...',
@@ -159,7 +159,7 @@ export function salvarCompromisso(e) {
             Swal.showLoading();
         }
     });
-    
+
     fetch(url, {
         method: metodo,
         headers: {
@@ -167,37 +167,37 @@ export function salvarCompromisso(e) {
         },
         body: JSON.stringify(dados)
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.sucesso) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Sucesso',
-                text: 'Compromisso salvo com sucesso!'
-            });
-            
-            closeAppointmentModal();
-            
-            // Recarregar compromissos
-            carregarCompromissos()
-                .then(() => renderizarCompromissos())
-                .then(() => atualizarRelatorios());
-        } else {
+        .then(response => response.json())
+        .then(data => {
+            if (data.sucesso) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sucesso',
+                    text: 'Compromisso salvo com sucesso!'
+                });
+
+                closeAppointmentModal();
+
+                // Recarregar compromissos
+                carregarCompromissos()
+                    .then(() => renderizarCompromissos())
+                    .then(() => atualizarRelatorios());
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: data.mensagem || 'Erro ao salvar compromisso'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao salvar compromisso:', error);
             Swal.fire({
                 icon: 'error',
                 title: 'Erro',
-                text: data.mensagem || 'Erro ao salvar compromisso'
+                text: 'Falha ao comunicar com o servidor'
             });
-        }
-    })
-    .catch(error => {
-        console.error('Erro ao salvar compromisso:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: 'Falha ao comunicar com o servidor'
         });
-    });
 }
 
 // Atalho para editar compromisso
@@ -216,7 +216,7 @@ export function excluirCompromisso(idCompromisso) {
         });
         return;
     }
-    
+
     Swal.fire({
         title: 'Tem certeza?',
         text: "Esta ação não poderá ser revertida!",
@@ -231,35 +231,35 @@ export function excluirCompromisso(idCompromisso) {
             fetch(`/agendas/${agendaId}/compromissos/${idCompromisso}`, {
                 method: 'DELETE'
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.sucesso) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Excluído!',
-                        text: 'Compromisso removido com sucesso.'
-                    });
-                    
-                    // Recarregar compromissos
-                    carregarCompromissos()
-                        .then(() => renderizarCompromissos())
-                        .then(() => atualizarRelatorios());
-                } else {
+                .then(response => response.json())
+                .then(data => {
+                    if (data.sucesso) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Excluído!',
+                            text: 'Compromisso removido com sucesso.'
+                        });
+
+                        // Recarregar compromissos
+                        carregarCompromissos()
+                            .then(() => renderizarCompromissos())
+                            .then(() => atualizarRelatorios());
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro',
+                            text: data.mensagem || 'Erro ao excluir compromisso'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao excluir compromisso:', error);
                     Swal.fire({
                         icon: 'error',
                         title: 'Erro',
-                        text: data.mensagem || 'Erro ao excluir compromisso'
+                        text: 'Falha ao comunicar com o servidor'
                     });
-                }
-            })
-            .catch(error => {
-                console.error('Erro ao excluir compromisso:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Erro',
-                    text: 'Falha ao comunicar com o servidor'
                 });
-            });
         }
     });
 }

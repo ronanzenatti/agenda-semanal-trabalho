@@ -15,7 +15,7 @@ let agendas = [];
 // Inicializar módulo de agendas
 export function initSchedules() {
     console.log('Inicializando módulo de agendas...');
-    
+
     // Carregar agendas do usuário
     carregarAgendas().then(() => {
         // Configurar event listeners
@@ -72,7 +72,7 @@ export function carregarAgendas() {
                 agendas = data.agendas;
                 atualizarListaAgendas();
                 atualizarSeletorAgendaAtiva();
-                
+
                 // Se houver agendas e nenhuma estiver selecionada, selecionar a primeira
                 if (agendas.length > 0 && !agendaAtiva) {
                     // Verificar se há uma agenda salva no sessionStorage
@@ -106,14 +106,14 @@ function atualizarListaAgendas() {
     }
 
     schedulesList.innerHTML = '';
-    
+
     agendas.forEach(agenda => {
         const agendaElement = document.createElement('div');
         agendaElement.className = 'flex justify-between items-center p-3 border rounded hover:bg-gray-50';
-        
+
         const dataInicio = new Date(agenda.data_inicio).toLocaleDateString('pt-BR');
         const dataFim = new Date(agenda.data_fim).toLocaleDateString('pt-BR');
-        
+
         agendaElement.innerHTML = `
             <div>
                 <h4 class="font-semibold">${agenda.nome}</h4>
@@ -131,7 +131,7 @@ function atualizarListaAgendas() {
                 </button>
             </div>
         `;
-        
+
         schedulesList.appendChild(agendaElement);
     });
 }
@@ -142,7 +142,7 @@ function atualizarSeletorAgendaAtiva() {
     if (!selector) return;
 
     selector.innerHTML = '';
-    
+
     if (agendas.length === 0) {
         selector.innerHTML = '<option value="">Nenhuma agenda disponível</option>';
         selector.disabled = true;
@@ -150,16 +150,16 @@ function atualizarSeletorAgendaAtiva() {
     }
 
     selector.disabled = false;
-    
+
     agendas.forEach(agenda => {
         const option = document.createElement('option');
         option.value = agenda.id_agenda;
         option.textContent = agenda.nome;
-        
+
         if (agendaAtiva && agenda.id_agenda === agendaAtiva.id_agenda) {
             option.selected = true;
         }
-        
+
         selector.appendChild(option);
     });
 }
@@ -169,18 +169,18 @@ function selecionarAgendaAtiva(agendaId) {
     if (!agendaId) return;
 
     agendaAtiva = agendas.find(a => a.id_agenda === agendaId);
-    
+
     if (agendaAtiva) {
         // Salvar no sessionStorage
         sessionStorage.setItem('agendaAtivaId', agendaId);
-        
+
         // CORREÇÃO: Atualizar as configurações globais com os dados da agenda
         atualizarDadosGlobais('configuracoes', {
             diasSemana: agendaAtiva.dias_semana || [1, 2, 3, 4, 5],
             horaInicioPadrao: agendaAtiva.hora_inicio_padrao || '07:00',
             horaFimPadrao: agendaAtiva.hora_fim_padrao || '23:00'
         });
-        
+
         // Recarregar dados relacionados à agenda
         Promise.all([
             carregarCompromissosAgenda(),
@@ -230,7 +230,7 @@ function mostrarFormularioNovaAgenda() {
     document.getElementById('scheduleName').value = '';
     document.getElementById('scheduleStartDate').value = '';
     document.getElementById('scheduleEndDate').value = '';
-    
+
     document.getElementById('scheduleFormContainer').classList.remove('hidden');
 }
 
@@ -242,18 +242,18 @@ function esconderFormularioAgenda() {
 // Salvar agenda (criar ou editar)
 function salvarAgenda(e) {
     e.preventDefault();
-    
+
     const agendaId = document.getElementById('scheduleId').value;
     const dados = {
         nome: document.getElementById('scheduleName').value,
         data_inicio: document.getElementById('scheduleStartDate').value,
         data_fim: document.getElementById('scheduleEndDate').value
     };
-    
+
     // Validar datas
     const dataInicio = new Date(dados.data_inicio);
     const dataFim = new Date(dados.data_fim);
-    
+
     if (dataFim <= dataInicio) {
         Swal.fire({
             icon: 'error',
@@ -262,10 +262,10 @@ function salvarAgenda(e) {
         });
         return;
     }
-    
+
     const metodo = agendaId ? 'PUT' : 'POST';
     const url = agendaId ? `/agendas/${agendaId}` : '/agendas';
-    
+
     fetch(url, {
         method: metodo,
         headers: {
@@ -273,49 +273,49 @@ function salvarAgenda(e) {
         },
         body: JSON.stringify(dados)
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.sucesso) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Sucesso',
-                text: 'Agenda salva com sucesso!'
-            });
-            
-            esconderFormularioAgenda();
-            carregarAgendas();
-        } else {
+        .then(response => response.json())
+        .then(data => {
+            if (data.sucesso) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sucesso',
+                    text: 'Agenda salva com sucesso!'
+                });
+
+                esconderFormularioAgenda();
+                carregarAgendas();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: data.mensagem || 'Erro ao salvar agenda'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao salvar agenda:', error);
             Swal.fire({
                 icon: 'error',
                 title: 'Erro',
-                text: data.mensagem || 'Erro ao salvar agenda'
+                text: 'Falha ao comunicar com o servidor'
             });
-        }
-    })
-    .catch(error => {
-        console.error('Erro ao salvar agenda:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: 'Falha ao comunicar com o servidor'
         });
-    });
 }
 
 // Configurar agenda (abrir modal de configuração)
-window.configurarAgenda = function(agendaId) {
+window.configurarAgenda = function (agendaId) {
     const agenda = agendas.find(a => a.id_agenda === agendaId);
     if (!agenda) return;
-    
+
     document.getElementById('configScheduleId').value = agendaId;
     document.getElementById('configScheduleNameDisplay').textContent = agenda.nome;
-    
+
     // Carregar dados da agenda para configuração
     carregarDadosConfiguracao(agendaId);
-    
+
     // Abrir modal
     document.getElementById('scheduleConfigModal').classList.remove('hidden');
-    
+
     // Mostrar aba financeira por padrão
     showConfigTab('financeiro');
 };
@@ -349,21 +349,21 @@ function exibirConfiguracaoFinanceira(configuracoes) {
         .then(data => {
             if (data.sucesso && data.locais) {
                 container.innerHTML = '';
-                
+
                 if (data.locais.length === 0) {
                     container.innerHTML = '<p class="text-gray-500 italic">Nenhum local de trabalho cadastrado. Cadastre locais antes de configurar valores.</p>';
                     return;
                 }
-                
+
                 data.locais.forEach(local => {
                     const config = configuracoes.find(c => c.local_id === local.id_local);
                     const valorAtual = config ? config.valor_hora : '';
-                    
+
                     const localConfig = document.createElement('div');
                     localConfig.className = 'flex items-center justify-between p-3 border rounded';
                     localConfig.style.borderLeftWidth = '4px';
                     localConfig.style.borderLeftColor = local.cor;
-                    
+
                     localConfig.innerHTML = `
                         <div class="flex-grow">
                             <label class="font-medium">${local.nome}</label>
@@ -381,7 +381,7 @@ function exibirConfiguracaoFinanceira(configuracoes) {
                             <span class="text-gray-600">/hora</span>
                         </div>
                     `;
-                    
+
                     container.appendChild(localConfig);
                 });
             }
@@ -394,7 +394,7 @@ function configurarDadosCalendario(agenda) {
     const daysContainer = document.getElementById('scheduleDaysOfWeekContainer');
     if (daysContainer) {
         daysContainer.innerHTML = '';
-        
+
         const diasSemana = {
             0: 'Domingo',
             1: 'Segunda',
@@ -404,10 +404,10 @@ function configurarDadosCalendario(agenda) {
             5: 'Sexta',
             6: 'Sábado'
         };
-        
+
         Object.entries(diasSemana).forEach(([dia, nome]) => {
             const isChecked = agenda.dias_semana.includes(parseInt(dia));
-            
+
             const dayCheckbox = document.createElement('label');
             dayCheckbox.className = 'flex items-center space-x-2';
             dayCheckbox.innerHTML = `
@@ -418,15 +418,15 @@ function configurarDadosCalendario(agenda) {
                        ${isChecked ? 'checked' : ''}>
                 <span>${nome}</span>
             `;
-            
+
             daysContainer.appendChild(dayCheckbox);
         });
     }
-    
+
     // Horários padrão
     const startTimeInput = document.getElementById('scheduleDefaultStartTime');
     const endTimeInput = document.getElementById('scheduleDefaultEndTime');
-    
+
     if (startTimeInput) startTimeInput.value = agenda.hora_inicio_padrao || '07:00';
     if (endTimeInput) endTimeInput.value = agenda.hora_fim_padrao || '23:00';
 }
@@ -435,20 +435,20 @@ function configurarDadosCalendario(agenda) {
 function salvarConfiguracaoFinanceira() {
     const agendaId = document.getElementById('configScheduleId').value;
     const inputs = document.querySelectorAll('.workplace-rate-input');
-    
+
     const promises = [];
-    
+
     inputs.forEach(input => {
         const localId = input.dataset.localId;
         const valorHora = parseFloat(input.value);
-        
+
         if (valorHora && valorHora > 0) {
             // Verificar se já existe configuração
             fetch(`/agendas/${agendaId}/locais_config`)
                 .then(response => response.json())
                 .then(data => {
                     const configExistente = data.configuracoes?.find(c => c.local_id === localId);
-                    
+
                     if (configExistente) {
                         // Atualizar configuração existente
                         promises.push(
@@ -478,7 +478,7 @@ function salvarConfiguracaoFinanceira() {
                 });
         }
     });
-    
+
     // Aguardar um pouco para as promises serem criadas
     setTimeout(() => {
         Promise.all(promises)
@@ -488,7 +488,7 @@ function salvarConfiguracaoFinanceira() {
                     title: 'Sucesso',
                     text: 'Configuração financeira salva com sucesso!'
                 });
-                
+
                 // Se for a agenda ativa, recarregar dados
                 if (agendaAtiva && agendaAtiva.id_agenda === agendaId) {
                     carregarConfiguracaoFinanceira().then(() => {
@@ -510,11 +510,11 @@ function salvarConfiguracaoFinanceira() {
 // Salvar configuração de calendário
 function salvarConfiguracaoCalendario() {
     const agendaId = document.getElementById('configScheduleId').value;
-    
+
     // Obter dias selecionados
     const checkboxes = document.querySelectorAll('input[name="scheduleDaysOfWeek"]:checked');
     const diasSemana = Array.from(checkboxes).map(cb => parseInt(cb.value));
-    
+
     // Validar se pelo menos um dia foi selecionado
     if (diasSemana.length === 0) {
         Swal.fire({
@@ -524,13 +524,13 @@ function salvarConfiguracaoCalendario() {
         });
         return;
     }
-    
+
     const dados = {
         dias_semana: diasSemana,
         hora_inicio_padrao: document.getElementById('scheduleDefaultStartTime').value,
         hora_fim_padrao: document.getElementById('scheduleDefaultEndTime').value
     };
-    
+
     fetch(`/agendas/${agendaId}`, {
         method: 'PUT',
         headers: {
@@ -538,74 +538,74 @@ function salvarConfiguracaoCalendario() {
         },
         body: JSON.stringify(dados)
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.sucesso) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Sucesso',
-                text: 'Configuração de calendário salva com sucesso!'
-            });
-            
-            // Atualizar dados locais
-            const agenda = agendas.find(a => a.id_agenda === agendaId);
-            if (agenda) {
-                agenda.dias_semana = dados.dias_semana;
-                agenda.hora_inicio_padrao = dados.hora_inicio_padrao;
-                agenda.hora_fim_padrao = dados.hora_fim_padrao;
-            }
-            
-            // Se for a agenda ativa, recarregar calendário
-            if (agendaAtiva && agendaAtiva.id_agenda === agendaId) {
-                atualizarDadosGlobais('configuracoes', {
-                    diasSemana: dados.dias_semana,
-                    horaInicioPadrao: dados.hora_inicio_padrao,
-                    horaFimPadrao: dados.hora_fim_padrao
+        .then(response => response.json())
+        .then(data => {
+            if (data.sucesso) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sucesso',
+                    text: 'Configuração de calendário salva com sucesso!'
                 });
-                
-                // Recarregar calendário
-                import('./calendar.js').then(module => {
-                    module.inicializarCalendario();
-                    module.renderizarCompromissos();
+
+                // Atualizar dados locais
+                const agenda = agendas.find(a => a.id_agenda === agendaId);
+                if (agenda) {
+                    agenda.dias_semana = dados.dias_semana;
+                    agenda.hora_inicio_padrao = dados.hora_inicio_padrao;
+                    agenda.hora_fim_padrao = dados.hora_fim_padrao;
+                }
+
+                // Se for a agenda ativa, recarregar calendário
+                if (agendaAtiva && agendaAtiva.id_agenda === agendaId) {
+                    atualizarDadosGlobais('configuracoes', {
+                        diasSemana: dados.dias_semana,
+                        horaInicioPadrao: dados.hora_inicio_padrao,
+                        horaFimPadrao: dados.hora_fim_padrao
+                    });
+
+                    // Recarregar calendário
+                    import('./calendar.js').then(module => {
+                        module.inicializarCalendario();
+                        module.renderizarCompromissos();
+                    });
+                }
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: data.mensagem || 'Erro ao salvar configuração'
                 });
             }
-        } else {
+        })
+        .catch(error => {
+            console.error('Erro ao salvar configuração de calendário:', error);
             Swal.fire({
                 icon: 'error',
                 title: 'Erro',
-                text: data.mensagem || 'Erro ao salvar configuração'
+                text: 'Falha ao comunicar com o servidor'
             });
-        }
-    })
-    .catch(error => {
-        console.error('Erro ao salvar configuração de calendário:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: 'Falha ao comunicar com o servidor'
         });
-    });
 }
 
 // Editar agenda
-window.editarAgenda = function(agendaId) {
+window.editarAgenda = function (agendaId) {
     const agenda = agendas.find(a => a.id_agenda === agendaId);
     if (!agenda) return;
-    
+
     document.getElementById('scheduleFormTitle').textContent = 'Editar Agenda';
     document.getElementById('scheduleId').value = agenda.id_agenda;
     document.getElementById('scheduleName').value = agenda.nome;
     document.getElementById('scheduleStartDate').value = agenda.data_inicio;
     document.getElementById('scheduleEndDate').value = agenda.data_fim;
-    
+
     document.getElementById('scheduleFormContainer').classList.remove('hidden');
 };
 
 // Excluir agenda
-window.excluirAgenda = function(agendaId) {
+window.excluirAgenda = function (agendaId) {
     const agenda = agendas.find(a => a.id_agenda === agendaId);
     if (!agenda) return;
-    
+
     Swal.fire({
         title: 'Tem certeza?',
         text: `Deseja excluir a agenda "${agenda.nome}"? Todos os compromissos associados também serão removidos.`,
@@ -620,57 +620,57 @@ window.excluirAgenda = function(agendaId) {
             fetch(`/agendas/${agendaId}`, {
                 method: 'DELETE'
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.sucesso) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Excluída!',
-                        text: 'Agenda removida com sucesso.'
-                    });
-                    
-                    // Se era a agenda ativa, limpar
-                    if (agendaAtiva && agendaAtiva.id_agenda === agendaId) {
-                        agendaAtiva = null;
-                        sessionStorage.removeItem('agendaAtivaId');
-                        atualizarDadosGlobais('compromissos', []);
-                        renderizarCompromissos();
-                        atualizarRelatorios();
+                .then(response => response.json())
+                .then(data => {
+                    if (data.sucesso) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Excluída!',
+                            text: 'Agenda removida com sucesso.'
+                        });
+
+                        // Se era a agenda ativa, limpar
+                        if (agendaAtiva && agendaAtiva.id_agenda === agendaId) {
+                            agendaAtiva = null;
+                            sessionStorage.removeItem('agendaAtivaId');
+                            atualizarDadosGlobais('compromissos', []);
+                            renderizarCompromissos();
+                            atualizarRelatorios();
+                        }
+
+                        carregarAgendas();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro',
+                            text: data.mensagem || 'Erro ao excluir agenda'
+                        });
                     }
-                    
-                    carregarAgendas();
-                } else {
+                })
+                .catch(error => {
+                    console.error('Erro ao excluir agenda:', error);
                     Swal.fire({
                         icon: 'error',
                         title: 'Erro',
-                        text: data.mensagem || 'Erro ao excluir agenda'
+                        text: 'Falha ao comunicar com o servidor'
                     });
-                }
-            })
-            .catch(error => {
-                console.error('Erro ao excluir agenda:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Erro',
-                    text: 'Falha ao comunicar com o servidor'
                 });
-            });
         }
     });
 };
 
 // Funções para controle de abas no modal de configuração
-window.showConfigTab = function(tab) {
+window.showConfigTab = function (tab) {
     // Ocultar todas as abas
     document.getElementById('configTabFinanceiro').classList.add('hidden');
     document.getElementById('configTabCalendario').classList.add('hidden');
-    
+
     // Remover classes ativas dos botões
     document.getElementById('tabButtonFinanceiro').classList.remove('border-indigo-500', 'text-indigo-600');
     document.getElementById('tabButtonFinanceiro').classList.add('border-transparent', 'text-gray-500');
     document.getElementById('tabButtonCalendario').classList.remove('border-indigo-500', 'text-indigo-600');
     document.getElementById('tabButtonCalendario').classList.add('border-transparent', 'text-gray-500');
-    
+
     // Mostrar aba selecionada
     if (tab === 'financeiro') {
         document.getElementById('configTabFinanceiro').classList.remove('hidden');
@@ -684,17 +684,17 @@ window.showConfigTab = function(tab) {
 };
 
 // Fechar modal de configuração
-window.closeScheduleConfigModal = function() {
+window.closeScheduleConfigModal = function () {
     document.getElementById('scheduleConfigModal').classList.add('hidden');
 };
 
 // Funções globais para abrir/fechar modal de agendas
-window.openSchedulesModal = function() {
+window.openSchedulesModal = function () {
     document.getElementById('schedulesModal').classList.remove('hidden');
     carregarAgendas();
 };
 
-window.closeSchedulesModal = function() {
+window.closeSchedulesModal = function () {
     document.getElementById('schedulesModal').classList.add('hidden');
 };
 

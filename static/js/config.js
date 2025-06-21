@@ -19,9 +19,9 @@ export function carregarConfiguracoes() {
                     horaInicioPadrao: data.configuracoes.hora_inicio_padrao,
                     horaFimPadrao: data.configuracoes.hora_fim_padrao
                 };
-                
+
                 atualizarDadosGlobais('configuracoes', novasConfig);
-                
+
                 // Atualizar interface com as configurações
                 atualizarInterfaceConfiguracoes();
             }
@@ -41,16 +41,16 @@ export function carregarConfiguracoes() {
 // Carregar configurações da agenda ativa (sobrescreve as gerais)
 export function carregarConfiguracoesAgenda(agenda) {
     if (!agenda) return;
-    
+
     const novasConfig = {
         diasSemana: agenda.dias_semana || [1, 2, 3, 4, 5],
         horaInicioPadrao: agenda.hora_inicio_padrao || '07:00',
         horaFimPadrao: agenda.hora_fim_padrao || '23:00'
     };
-    
+
     atualizarDadosGlobais('configuracoes', novasConfig);
     atualizarInterfaceConfiguracoes();
-    
+
     // Reinicializar calendário com as novas configurações
     inicializarCalendario();
     renderizarCompromissos();
@@ -63,11 +63,11 @@ export function atualizarInterfaceConfiguracoes() {
     checkboxes.forEach(checkbox => {
         checkbox.checked = configuracoes.diasSemana.includes(parseInt(checkbox.value));
     });
-    
+
     // Atualizar horários padrão
     const startTimeInput = document.getElementById('defaultStartTime');
     const endTimeInput = document.getElementById('defaultEndTime');
-    
+
     if (startTimeInput) startTimeInput.value = configuracoes.horaInicioPadrao;
     if (endTimeInput) endTimeInput.value = configuracoes.horaFimPadrao;
 }
@@ -75,7 +75,7 @@ export function atualizarInterfaceConfiguracoes() {
 // Abrir modal de configurações
 export function openConfigModal() {
     const agendaId = getActiveScheduleId();
-    
+
     if (agendaId) {
         // Se há agenda ativa, mostrar aviso
         Swal.fire({
@@ -86,7 +86,7 @@ export function openConfigModal() {
         });
         return;
     }
-    
+
     // Se não há agenda ativa, permitir configurações gerais
     atualizarInterfaceConfiguracoes();
     document.getElementById('configModal').classList.remove('hidden');
@@ -100,7 +100,7 @@ export function closeConfigModal() {
 // Salvar configurações
 export function salvarConfiguracoes(e) {
     e.preventDefault();
-    
+
     // Verificar se há agenda ativa
     const agendaId = getActiveScheduleId();
     if (agendaId) {
@@ -113,11 +113,11 @@ export function salvarConfiguracoes(e) {
         closeConfigModal();
         return;
     }
-    
+
     // Obter dias da semana selecionados
     const checkboxes = document.querySelectorAll('input[name="daysToShow"]:checked');
     const diasSemana = Array.from(checkboxes).map(checkbox => parseInt(checkbox.value));
-    
+
     // Verificar se pelo menos um dia foi selecionado
     if (diasSemana.length === 0) {
         Swal.fire({
@@ -127,13 +127,13 @@ export function salvarConfiguracoes(e) {
         });
         return;
     }
-    
+
     const dados = {
         dias_semana: diasSemana,
         hora_inicio_padrao: document.getElementById('defaultStartTime').value,
         hora_fim_padrao: document.getElementById('defaultEndTime').value
     };
-    
+
     fetch('/configuracoes', {
         method: 'PUT',
         headers: {
@@ -141,46 +141,46 @@ export function salvarConfiguracoes(e) {
         },
         body: JSON.stringify(dados)
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.sucesso) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Sucesso',
-                text: 'Configurações salvas com sucesso!'
-            });
-            
-            closeConfigModal();
-            
-            // Atualizar configurações locais
-            const novasConfig = {
-                diasSemana: dados.dias_semana,
-                horaInicioPadrao: dados.hora_inicio_padrao,
-                horaFimPadrao: dados.hora_fim_padrao
-            };
-            
-            atualizarDadosGlobais('configuracoes', novasConfig);
-            
-            // Reinicializar calendário e recarregar compromissos
-            inicializarCalendario();
-            renderizarCompromissos();
-            
-            // Verificar responsividade
-            verificarResponsividade();
-        } else {
+        .then(response => response.json())
+        .then(data => {
+            if (data.sucesso) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sucesso',
+                    text: 'Configurações salvas com sucesso!'
+                });
+
+                closeConfigModal();
+
+                // Atualizar configurações locais
+                const novasConfig = {
+                    diasSemana: dados.dias_semana,
+                    horaInicioPadrao: dados.hora_inicio_padrao,
+                    horaFimPadrao: dados.hora_fim_padrao
+                };
+
+                atualizarDadosGlobais('configuracoes', novasConfig);
+
+                // Reinicializar calendário e recarregar compromissos
+                inicializarCalendario();
+                renderizarCompromissos();
+
+                // Verificar responsividade
+                verificarResponsividade();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: data.mensagem || 'Erro ao salvar configurações'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao salvar configurações:', error);
             Swal.fire({
                 icon: 'error',
                 title: 'Erro',
-                text: data.mensagem || 'Erro ao salvar configurações'
+                text: 'Falha ao comunicar com o servidor'
             });
-        }
-    })
-    .catch(error => {
-        console.error('Erro ao salvar configurações:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: 'Falha ao comunicar com o servidor'
         });
-    });
 }

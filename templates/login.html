@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <title>Login - Agenda de Trabalho</title>
@@ -19,8 +19,10 @@
         </div>
 
         <div class="flex mb-4">
-            <button id="loginTabBtn" class="flex-1 py-2 border-b-2 border-blue-500 text-blue-500 font-medium">Login</button>
-            <button id="registerTabBtn" class="flex-1 py-2 border-b-2 border-gray-300 text-gray-500 font-medium">Cadastro</button>
+            <button id="loginTabBtn"
+                class="flex-1 py-2 border-b-2 border-blue-500 text-blue-500 font-medium">Login</button>
+            <button id="registerTabBtn"
+                class="flex-1 py-2 border-b-2 border-gray-300 text-gray-500 font-medium">Cadastro</button>
         </div>
 
         <!-- Formulário de Login -->
@@ -58,19 +60,20 @@
                 <label class="block text-sm mb-1">Confirmar Senha</label>
                 <input type="password" id="registerPasswordConfirm" class="w-full p-2 border rounded" required>
             </div>
-            <button type="submit" class="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600">Cadastrar</button>
+            <button type="submit"
+                class="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600">Cadastrar</button>
         </form>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Alternar entre as abas de login e registro
             const loginTabBtn = document.getElementById('loginTabBtn');
             const registerTabBtn = document.getElementById('registerTabBtn');
             const loginForm = document.getElementById('loginForm');
             const registerForm = document.getElementById('registerForm');
 
-            loginTabBtn.addEventListener('click', function() {
+            loginTabBtn.addEventListener('click', function () {
                 loginTabBtn.classList.remove('border-gray-300', 'text-gray-500');
                 loginTabBtn.classList.add('border-blue-500', 'text-blue-500');
                 registerTabBtn.classList.remove('border-blue-500', 'text-blue-500');
@@ -79,7 +82,7 @@
                 registerForm.classList.add('hidden');
             });
 
-            registerTabBtn.addEventListener('click', function() {
+            registerTabBtn.addEventListener('click', function () {
                 registerTabBtn.classList.remove('border-gray-300', 'text-gray-500');
                 registerTabBtn.classList.add('border-blue-500', 'text-blue-500');
                 loginTabBtn.classList.remove('border-blue-500', 'text-blue-500');
@@ -89,12 +92,12 @@
             });
 
             // Envio do formulário de login
-            loginForm.addEventListener('submit', function(e) {
+            loginForm.addEventListener('submit', function (e) {
                 e.preventDefault();
-                
+
                 const email = document.getElementById('loginEmail').value;
                 const senha = document.getElementById('loginPassword').value;
-                
+
                 fetch('/auth/login', {
                     method: 'POST',
                     headers: {
@@ -102,66 +105,66 @@
                     },
                     body: JSON.stringify({ email, senha })
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.sucesso) {
-                        // Adicionar dados ao sessionStorage
-                        sessionStorage.setItem('usuario_id', data.usuario.id);
-                        sessionStorage.setItem('nome', data.usuario.nome);
-                        sessionStorage.setItem('cpf', data.usuario.cpf);
-                        
-                        console.log('Dados salvos na sessão:', {
-                            id: data.usuario.id,
-                            nome: data.usuario.nome,
-                            cpf: data.usuario.cpf
-                        });
-                        
-                        window.location.href = '/';
-                    } else {
-                        const mensagemErro = data.mensagem || 'Erro ao fazer login';
-                        // Verificar se a mensagem de erro indica e-mail não confirmado
-                        // Ajuste estas strings conforme as mensagens reais do seu backend/Supabase
-                        const isEmailUnconfirmed = mensagemErro.toLowerCase().includes('email not confirmed') ||
-                                                   mensagemErro.toLowerCase().includes('user not confirmed') ||
-                                                   mensagemErro.toLowerCase().includes('confirme seu e-mail') ||
-                                                   mensagemErro.toLowerCase().includes('email precisa ser confirmado');
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.sucesso) {
+                            // Adicionar dados ao sessionStorage
+                            sessionStorage.setItem('usuario_id', data.usuario.id);
+                            sessionStorage.setItem('nome', data.usuario.nome);
+                            sessionStorage.setItem('cpf', data.usuario.cpf);
 
-                        if (isEmailUnconfirmed) {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Email Não Confirmado',
-                                text: 'Seu email ainda não foi confirmado. Por favor, verifique sua caixa de entrada (e pasta de spam) para o link de ativação antes de tentar fazer login.',
-                                confirmButtonText: 'Entendi'
+                            console.log('Dados salvos na sessão:', {
+                                id: data.usuario.id,
+                                nome: data.usuario.nome,
+                                cpf: data.usuario.cpf
                             });
+
+                            window.location.href = '/';
                         } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Erro',
-                                text: mensagemErro
-                            });
+                            const mensagemErro = data.mensagem || 'Erro ao fazer login';
+                            // Verificar se a mensagem de erro indica e-mail não confirmado
+                            // Ajuste estas strings conforme as mensagens reais do seu backend/Supabase
+                            const isEmailUnconfirmed = mensagemErro.toLowerCase().includes('email not confirmed') ||
+                                mensagemErro.toLowerCase().includes('user not confirmed') ||
+                                mensagemErro.toLowerCase().includes('confirme seu e-mail') ||
+                                mensagemErro.toLowerCase().includes('email precisa ser confirmado');
+
+                            if (isEmailUnconfirmed) {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Email Não Confirmado',
+                                    text: 'Seu email ainda não foi confirmado. Por favor, verifique sua caixa de entrada (e pasta de spam) para o link de ativação antes de tentar fazer login.',
+                                    confirmButtonText: 'Entendi'
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Erro',
+                                    text: mensagemErro
+                                });
+                            }
                         }
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro na requisição:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Erro',
-                        text: 'Falha ao comunicar com o servidor'
+                    })
+                    .catch(error => {
+                        console.error('Erro na requisição:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro',
+                            text: 'Falha ao comunicar com o servidor'
+                        });
                     });
-                });
             });
 
             // Envio do formulário de registro
-            registerForm.addEventListener('submit', function(e) {
+            registerForm.addEventListener('submit', function (e) {
                 e.preventDefault();
-                
+
                 const nome = document.getElementById('registerName').value;
                 const cpf = document.getElementById('registerCPF').value;
                 const email = document.getElementById('registerEmail').value;
                 const senha = document.getElementById('registerPassword').value;
                 const confirmarSenha = document.getElementById('registerPasswordConfirm').value;
-                
+
                 // Validação básica
                 if (senha !== confirmarSenha) {
                     Swal.fire({
@@ -171,7 +174,7 @@
                     });
                     return;
                 }
-                
+
                 // Validar CPF (formato básico)
                 if (!/^\d{3}\.\d{3}\.\d{3}\-\d{2}$/.test(cpf) && !/^\d{11}$/.test(cpf)) {
                     Swal.fire({
@@ -181,7 +184,7 @@
                     });
                     return;
                 }
-                
+
                 fetch('/auth/registrar', {
                     method: 'POST',
                     headers: {
@@ -189,34 +192,34 @@
                     },
                     body: JSON.stringify({ nome, cpf, email, senha })
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.sucesso) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Sucesso!',
-                            text: 'Conta criada com sucesso! Confirme seu E-mail antes de realizar o login, verifique sua caixa de entrada ou spam.',
-                            confirmButtonText: 'Ir para Login'
-                        }).then(() => {
-                            // Alternar para a aba de login
-                            loginTabBtn.click();
-                        });
-                    } else {
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.sucesso) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Sucesso!',
+                                text: 'Conta criada com sucesso! Confirme seu E-mail antes de realizar o login, verifique sua caixa de entrada ou spam.',
+                                confirmButtonText: 'Ir para Login'
+                            }).then(() => {
+                                // Alternar para a aba de login
+                                loginTabBtn.click();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro',
+                                text: data.mensagem || 'Erro ao registrar conta'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro na requisição:', error);
                         Swal.fire({
                             icon: 'error',
                             title: 'Erro',
-                            text: data.mensagem || 'Erro ao registrar conta'
+                            text: 'Falha ao comunicar com o servidor'
                         });
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro na requisição:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Erro',
-                        text: 'Falha ao comunicar com o servidor'
                     });
-                });
             });
         });
     </script>

@@ -1,7 +1,6 @@
 /**
  * Agenda de Trabalho - JavaScript para visualização pública
  */
-
 // Inicialização
 document.addEventListener('DOMContentLoaded', function () {
     inicializarCalendario();

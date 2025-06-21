@@ -1,7 +1,6 @@
 /**
  * Agenda de Trabalho - Renderização e Manipulação do Calendário
  */
-
 import { diasSemana, configuracoes, compromissos, locaisTrabalho } from './app.js';
 import { converterTempoParaMinutos, formatarHora } from './utils.js';
 

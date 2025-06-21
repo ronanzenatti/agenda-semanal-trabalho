@@ -24,9 +24,9 @@ export function atualizarInterfaceLocaisTrabalho() {
     // Atualizar lista de locais de trabalho
     const listaLocais = document.getElementById('workplacesList');
     if (!listaLocais) return;
-    
+
     listaLocais.innerHTML = '';
-    
+
     if (locaisTrabalho.length === 0) {
         listaLocais.innerHTML = '<p class="text-gray-500 italic">Nenhum local de trabalho cadastrado.</p>';
     } else {
@@ -34,7 +34,7 @@ export function atualizarInterfaceLocaisTrabalho() {
             const localElement = document.createElement('div');
             localElement.className = 'flex justify-between items-center p-3 border rounded';
             localElement.style.borderLeft = `4px solid ${local.cor}`;
-            
+
             localElement.innerHTML = `
                 <div>
                     <strong>${local.nome}</strong>
@@ -50,16 +50,16 @@ export function atualizarInterfaceLocaisTrabalho() {
                     </button>
                 </div>
             `;
-            
+
             listaLocais.appendChild(localElement);
         });
     }
-    
+
     // Atualizar dropdown de relacionamentos em locais de trabalho
     const selectRelacionado = document.getElementById('workplaceRelated');
     if (selectRelacionado) {
         selectRelacionado.innerHTML = '<option value="">Nenhum</option>';
-        
+
         locaisTrabalho.forEach(local => {
             const option = document.createElement('option');
             option.value = local.id_local;
@@ -67,12 +67,12 @@ export function atualizarInterfaceLocaisTrabalho() {
             selectRelacionado.appendChild(option);
         });
     }
-    
+
     // Atualizar dropdown de locais de trabalho no formulário de compromissos
     const selectLocal = document.getElementById('workplace');
     if (selectLocal) {
         selectLocal.innerHTML = '';
-        
+
         locaisTrabalho.forEach(local => {
             const option = document.createElement('option');
             option.value = local.id_local;
@@ -98,11 +98,11 @@ export function mostrarFormularioLocalTrabalho() {
     document.getElementById('workplaceFormTitle').textContent = 'Novo Local de Trabalho';
     document.getElementById('workplaceId').value = '';
     document.getElementById('workplaceName').value = '';
-    document.getElementById('workplaceColor').value = '#' + Math.floor(Math.random()*16777215).toString(16); // Cor aleatória
+    document.getElementById('workplaceColor').value = '#' + Math.floor(Math.random() * 16777215).toString(16); // Cor aleatória
     document.getElementById('workplaceBonus').value = '0';
     document.getElementById('workplaceGrace').value = '60';
     document.getElementById('workplaceRelated').value = '';
-    
+
     document.getElementById('workplaceForm').classList.remove('hidden');
 }
 
@@ -115,7 +115,7 @@ export function hideWorkplaceForm() {
 export function editarLocalTrabalho(idLocal) {
     const local = locaisTrabalho.find(l => l.id_local === idLocal);
     if (!local) return;
-    
+
     document.getElementById('workplaceFormTitle').textContent = 'Editar Local de Trabalho';
     document.getElementById('workplaceId').value = local.id_local;
     document.getElementById('workplaceName').value = local.nome;
@@ -123,14 +123,14 @@ export function editarLocalTrabalho(idLocal) {
     document.getElementById('workplaceBonus').value = local.acrescimo_ha_percent;
     document.getElementById('workplaceGrace').value = local.periodo_carencia;
     document.getElementById('workplaceRelated').value = local.relacionado_com || '';
-    
+
     document.getElementById('workplaceForm').classList.remove('hidden');
 }
 
 // Salvar local de trabalho
 export function salvarLocalTrabalho(e) {
     e.preventDefault();
-    
+
     const idLocal = document.getElementById('workplaceId').value;
     const dados = {
         nome: document.getElementById('workplaceName').value,
@@ -139,11 +139,11 @@ export function salvarLocalTrabalho(e) {
         periodo_carencia: parseInt(document.getElementById('workplaceGrace').value) || 0,
         relacionado_com: document.getElementById('workplaceRelated').value || null
     };
-    
+
     // Método e URL baseados em ser novo ou edição
     const metodo = idLocal ? 'PUT' : 'POST';
     const url = idLocal ? `/locais/${idLocal}` : '/locais';
-    
+
     fetch(url, {
         method: metodo,
         headers: {
@@ -151,33 +151,33 @@ export function salvarLocalTrabalho(e) {
         },
         body: JSON.stringify(dados)
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.sucesso) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Sucesso',
-                text: 'Local de trabalho salvo com sucesso!'
-            });
-            
-            hideWorkplaceForm();
-            carregarLocaisTrabalho();
-        } else {
+        .then(response => response.json())
+        .then(data => {
+            if (data.sucesso) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sucesso',
+                    text: 'Local de trabalho salvo com sucesso!'
+                });
+
+                hideWorkplaceForm();
+                carregarLocaisTrabalho();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: data.mensagem || 'Erro ao salvar local de trabalho'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao salvar local de trabalho:', error);
             Swal.fire({
                 icon: 'error',
                 title: 'Erro',
-                text: data.mensagem || 'Erro ao salvar local de trabalho'
+                text: 'Falha ao comunicar com o servidor'
             });
-        }
-    })
-    .catch(error => {
-        console.error('Erro ao salvar local de trabalho:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: 'Falha ao comunicar com o servidor'
         });
-    });
 }
 
 // Excluir local de trabalho
@@ -196,36 +196,36 @@ export function excluirLocalTrabalho(idLocal) {
             fetch(`/locais/${idLocal}`, {
                 method: 'DELETE'
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.sucesso) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Excluído!',
-                        text: 'Local de trabalho removido com sucesso.'
-                    });
-                    
-                    // Recarregar dados
-                    carregarLocaisTrabalho()
-                        .then(() => carregarCompromissos())
-                        .then(() => renderizarCompromissos())
-                        .then(() => atualizarRelatorios());
-                } else {
+                .then(response => response.json())
+                .then(data => {
+                    if (data.sucesso) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Excluído!',
+                            text: 'Local de trabalho removido com sucesso.'
+                        });
+
+                        // Recarregar dados
+                        carregarLocaisTrabalho()
+                            .then(() => carregarCompromissos())
+                            .then(() => renderizarCompromissos())
+                            .then(() => atualizarRelatorios());
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro',
+                            text: data.mensagem || 'Erro ao excluir local de trabalho'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao excluir local de trabalho:', error);
                     Swal.fire({
                         icon: 'error',
                         title: 'Erro',
-                        text: data.mensagem || 'Erro ao excluir local de trabalho'
+                        text: 'Falha ao comunicar com o servidor'
                     });
-                }
-            })
-            .catch(error => {
-                console.error('Erro ao excluir local de trabalho:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Erro',
-                    text: 'Falha ao comunicar com o servidor'
                 });
-            });
         }
     });
 }
