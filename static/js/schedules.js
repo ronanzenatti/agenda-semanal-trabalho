@@ -75,7 +75,18 @@ export function carregarAgendas() {
                 
                 // Se houver agendas e nenhuma estiver selecionada, selecionar a primeira
                 if (agendas.length > 0 && !agendaAtiva) {
-                    selecionarAgendaAtiva(agendas[0].id_agenda);
+                    // Verificar se há uma agenda salva no sessionStorage
+                    const agendaAtivaId = sessionStorage.getItem('agendaAtivaId');
+                    if (agendaAtivaId && agendas.find(a => a.id_agenda === agendaAtivaId)) {
+                        selecionarAgendaAtiva(agendaAtivaId);
+                    } else {
+                        selecionarAgendaAtiva(agendas[0].id_agenda);
+                    }
+                } else if (agendas.length === 0) {
+                    // CORREÇÃO: Se não há agendas, limpar o calendário
+                    import('./calendar.js').then(module => {
+                        module.inicializarCalendario();
+                    });
                 }
             }
         })
@@ -163,12 +174,23 @@ function selecionarAgendaAtiva(agendaId) {
         // Salvar no sessionStorage
         sessionStorage.setItem('agendaAtivaId', agendaId);
         
+        // CORREÇÃO: Atualizar as configurações globais com os dados da agenda
+        atualizarDadosGlobais('configuracoes', {
+            diasSemana: agendaAtiva.dias_semana || [1, 2, 3, 4, 5],
+            horaInicioPadrao: agendaAtiva.hora_inicio_padrao || '07:00',
+            horaFimPadrao: agendaAtiva.hora_fim_padrao || '23:00'
+        });
+        
         // Recarregar dados relacionados à agenda
         Promise.all([
             carregarCompromissosAgenda(),
             carregarConfiguracaoFinanceira()
         ]).then(() => {
-            renderizarCompromissos();
+            // CORREÇÃO: Inicializar calendário antes de renderizar compromissos
+            import('./calendar.js').then(module => {
+                module.inicializarCalendario();
+                module.renderizarCompromissos();
+            });
             atualizarRelatorios();
         });
     }
@@ -684,11 +706,4 @@ export function getActiveScheduleId() {
 // Exportar função para obter a agenda ativa completa
 export function getActiveSchedule() {
     return agendaAtiva;
-}
-
-// Restaurar agenda ativa do sessionStorage ao carregar
-const agendaAtivaId = sessionStorage.getItem('agendaAtivaId');
-if (agendaAtivaId) {
-    // Será selecionada após carregar as agendas
-    console.log('Agenda ativa restaurada:', agendaAtivaId);
 }

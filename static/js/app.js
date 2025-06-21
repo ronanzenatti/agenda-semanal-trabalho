@@ -79,6 +79,10 @@ function carregarDados() {
             }
         })
         .then(() => {
+            // Aguardar um pequeno delay para garantir que a agenda foi selecionada
+            return new Promise(resolve => setTimeout(resolve, 100));
+        })
+        .then(() => {
             // Carregar locais de trabalho
             return workplaces.carregarLocaisTrabalho();
         })
@@ -87,16 +91,20 @@ function carregarDados() {
             return appointments.carregarCompromissos();
         })
         .then(() => {
-            // Renderizar compromissos
-            calendar.renderizarCompromissos();
-
-            // Verificar se é mobile para ajustar visualização
-            if (window.innerWidth <= 768) {
-                responsive.ajustarVisualizacaoParaMobile();
+            // CORREÇÃO: Não inicializar calendário aqui, pois já foi feito ao selecionar agenda
+            // Apenas renderizar compromissos se houver agenda ativa
+            const agendaId = getActiveScheduleId();
+            if (agendaId) {
+                calendar.renderizarCompromissos();
+                
+                // Verificar se é mobile para ajustar visualização
+                if (window.innerWidth <= 768) {
+                    responsive.ajustarVisualizacaoParaMobile();
+                }
+                
+                // Atualizar relatórios
+                reports.atualizarRelatorios();
             }
-
-            // Atualizar relatórios
-            reports.atualizarRelatorios();
         })
         .catch(error => {
             console.error('Erro ao carregar dados:', error);
