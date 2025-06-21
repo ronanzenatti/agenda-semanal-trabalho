@@ -6,20 +6,44 @@ import { atualizarDadosGlobais, compromissos, locaisTrabalho } from './app.js';
 import { renderizarCompromissos } from './calendar.js';
 import { atualizarRelatorios } from './reports.js';
 import { converterTempoParaMinutos } from './utils.js';
+import { getActiveScheduleId } from './schedules.js';
 
 // Carregar compromissos do servidor
 export function carregarCompromissos() {
-    return fetch('/compromissos')
+    const agendaId = getActiveScheduleId();
+    
+    if (!agendaId) {
+        // Se não há agenda ativa, limpar compromissos
+        atualizarDadosGlobais('compromissos', []);
+        return Promise.resolve();
+    }
+    
+    return fetch(`/agendas/${agendaId}/compromissos`)
         .then(response => response.json())
         .then(data => {
             if (data.sucesso && data.compromissos) {
                 atualizarDadosGlobais('compromissos', data.compromissos);
             }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar compromissos:', error);
+            atualizarDadosGlobais('compromissos', []);
         });
 }
 
 // Abrir modal de compromisso
 export function openAppointmentModal(idCompromisso = null) {
+    // Verificar se há agenda ativa
+    const agendaId = getActiveScheduleId();
+    if (!agendaId) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Atenção',
+            text: 'Selecione ou crie uma agenda antes de adicionar compromissos.'
+        });
+        return;
+    }
+    
     // Resetar formulário
     document.getElementById('appointmentForm').reset();
     document.getElementById('editingId').value = '';
@@ -70,6 +94,16 @@ export function calculateDuration() {
 export function salvarCompromisso(e) {
     e.preventDefault();
     
+    const agendaId = getActiveScheduleId();
+    if (!agendaId) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: 'Nenhuma agenda ativa selecionada'
+        });
+        return;
+    }
+    
     const idCompromisso = document.getElementById('editingId').value;
     const diaSemana = parseInt(document.getElementById('dayOfWeek').value);
     const localId = document.getElementById('workplace').value;
@@ -79,7 +113,7 @@ export function salvarCompromisso(e) {
     const hourType = document.querySelector('input[name="hourType"]:checked').value;
     const duration = parseFloat(document.getElementById('duration').value);
     
-    // Validações
+    // Validações básicas
     if (!localId) {
         Swal.fire({
             icon: 'error',
@@ -99,100 +133,6 @@ export function salvarCompromisso(e) {
         return;
     }
     
-    // Verificar limite de 8 horas por dia
-    const localAtual = locaisTrabalho.find(l => l.id_local === localId);
-    
-    // Localizar compromissos do mesmo dia e local ou locais relacionados
-    const compromissosMesmoDia = compromissos.filter(c => {
-        // Ignorar o próprio compromisso em caso de edição
-        if (idCompromisso && c.id_compromisso === idCompromisso) return false;
-        
-        // Verificar se é do mesmo dia
-        if (c.dia_semana !== diaSemana) return false;
-        
-        // Verificar se é do mesmo local
-        if (c.local_id === localId) return true;
-        
-        // Verificar se o local está relacionado
-        const localCompromisso = locaisTrabalho.find(l => l.id_local === c.local_id);
-        if (!localCompromisso) return false;
-        
-        // Verificar relação entre locais (em ambas direções)
-        return (localCompromisso.relacionado_com === localId || localAtual.relacionado_com === c.local_id);
-    });
-    
-    // Calcular total de horas para o dia
-    const totalHorasDia = compromissosMesmoDia.reduce((total, c) => total + parseFloat(c.duracao), 0);
-    
-    if (totalHorasDia + duration > 8) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: 'O total de horas por dia para cada local (e locais relacionados) não pode exceder 8 horas!'
-        });
-        return;
-    }
-    
-    // Verificar sobreposição de compromissos
-    const start = converterTempoParaMinutos(startTime);
-    const end = converterTempoParaMinutos(endTime);
-    
-    const temSobreposicao = compromissos.some(c => {
-        // Ignorar o próprio compromisso em caso de edição
-        if (idCompromisso && c.id_compromisso === idCompromisso) return false;
-        
-        // Verificar se é do mesmo dia
-        if (c.dia_semana !== diaSemana) return false;
-        
-        const existingStart = converterTempoParaMinutos(c.hora_inicio);
-        const existingEnd = converterTempoParaMinutos(c.hora_fim);
-        
-        return (start < existingEnd && end > existingStart);
-    });
-    
-    if (temSobreposicao) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: 'Já existe um compromisso neste horário!'
-        });
-        return;
-    }
-    
-    // Verificar período de carência entre locais diferentes
-    const localRelacionado = locaisTrabalho.find(l => l.id_local === localAtual.relacionado_com);
-    const periodoCarencia = localAtual.periodo_carencia;
-    
-    const temViolacaoCarencia = compromissos.some(c => {
-        // Ignorar o próprio compromisso em caso de edição
-        if (idCompromisso && c.id_compromisso === idCompromisso) return false;
-        
-        // Verificar se é do mesmo dia
-        if (c.dia_semana !== diaSemana) return false;
-        
-        // Ignorar se for do mesmo local ou de um local relacionado
-        if (c.local_id === localId) return false;
-        if (localRelacionado && c.local_id === localRelacionado.id_local) return false;
-        
-        const existingStart = converterTempoParaMinutos(c.hora_inicio);
-        const existingEnd = converterTempoParaMinutos(c.hora_fim);
-        
-        const graceBefore = start - existingEnd;
-        const graceAfter = existingStart - end;
-        
-        return (graceBefore >= 0 && graceBefore < periodoCarencia) || 
-               (graceAfter >= 0 && graceAfter < periodoCarencia);
-    });
-    
-    if (temViolacaoCarencia) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Erro',
-            text: `É necessário respeitar o período de carência de ${periodoCarencia} minutos entre locais diferentes!`
-        });
-        return;
-    }
-    
     // Preparar dados para envio
     const dados = {
         local_id: localId,
@@ -206,7 +146,19 @@ export function salvarCompromisso(e) {
     
     // Método e URL baseados em ser novo ou edição
     const metodo = idCompromisso ? 'PUT' : 'POST';
-    const url = idCompromisso ? `/compromissos/${idCompromisso}` : '/compromissos';
+    const url = idCompromisso ? 
+        `/agendas/${agendaId}/compromissos/${idCompromisso}` : 
+        `/agendas/${agendaId}/compromissos`;
+    
+    // Mostrar loading
+    Swal.fire({
+        title: 'Salvando...',
+        text: 'Aguarde enquanto salvamos o compromisso',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
     
     fetch(url, {
         method: metodo,
@@ -255,6 +207,16 @@ export function editarCompromisso(idCompromisso) {
 
 // Excluir compromisso
 export function excluirCompromisso(idCompromisso) {
+    const agendaId = getActiveScheduleId();
+    if (!agendaId) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: 'Nenhuma agenda ativa selecionada'
+        });
+        return;
+    }
+    
     Swal.fire({
         title: 'Tem certeza?',
         text: "Esta ação não poderá ser revertida!",
@@ -266,7 +228,7 @@ export function excluirCompromisso(idCompromisso) {
         cancelButtonText: 'Cancelar'
     }).then((result) => {
         if (result.isConfirmed) {
-            fetch(`/compromissos/${idCompromisso}`, {
+            fetch(`/agendas/${agendaId}/compromissos/${idCompromisso}`, {
                 method: 'DELETE'
             })
             .then(response => response.json())
