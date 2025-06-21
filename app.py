@@ -110,27 +110,54 @@ def _validate_appointment(supabase_client, agenda_id, appointment_data, usuario_
     if not current_workplace_details:
         return False, jsonify({"sucesso": False, "mensagem": "Local de trabalho do compromisso não encontrado para validação."}), 400 # Should be 400 as it's bad input data
 
-    # Rule 2: Daily Work Limit (Linked Workplaces - max 8 hours)
-    linked_workplace_ids = _get_linked_workplace_ids(supabase_client, local_id_new_app, usuario_id)
-    if not linked_workplace_ids: # If the principal local_id was invalid or not user's
-        pass # Allow if only the current workplace is considered (isolated)
-
+    # Get existing appointments for the day
     existing_appointments_today = _get_appointments_for_validation(supabase_client, agenda_id, dia_semana_new_app, exclude_id=existing_appointment_id)
 
-    total_linked_duration_today = 0.0 # Start with 0 and add new_app later if it's part of linked group (it always is)
-    if local_id_new_app in linked_workplace_ids: # This should always be true by definition of linked_workplace_ids
-        total_linked_duration_today += duracao_new_app
+    # CORREÇÃO 1: Verificar sobreposição de horários independente do local
+    new_app_start_minutes = _time_str_to_minutes(hora_inicio_new_app)
+    new_app_end_minutes = _time_str_to_minutes(hora_fim_new_app)
+    
+    for app in existing_appointments_today:
+        app_start = _time_str_to_minutes(app['hora_inicio'])
+        app_end = _time_str_to_minutes(app['hora_fim'])
+        
+        # Verificar se há sobreposição de horários
+        # Sobreposição ocorre quando:
+        # 1. O novo compromisso começa durante um existente
+        # 2. O novo compromisso termina durante um existente
+        # 3. O novo compromisso engloba completamente um existente
+        # 4. Um existente engloba completamente o novo compromisso
+        if (new_app_start_minutes < app_end and new_app_end_minutes > app_start):
+            return False, jsonify({
+                "sucesso": False, 
+                "mensagem": f"Conflito de horário: já existe um compromisso das {app['hora_inicio']} às {app['hora_fim']}."
+            }), 400
 
+    # CORREÇÃO 2: Limite de 8 horas diárias - somar DURAÇÃO em vez de calcular pela diferença de horários
+    linked_workplace_ids = _get_linked_workplace_ids(supabase_client, local_id_new_app, usuario_id)
+    
+    # Iniciar com a duração do novo compromisso
+    total_linked_duration_today = duracao_new_app
+    
+    # Somar as durações dos compromissos existentes em locais relacionados
     for app in existing_appointments_today:
         if app['local_id'] in linked_workplace_ids:
             total_linked_duration_today += float(app['duracao'])
 
-    if total_linked_duration_today > 8.0: # Using a small tolerance for float comparisons
-        return False, jsonify({"sucesso": False, "mensagem": f"Limite de trabalho diário para locais vinculados ({', '.join(linked_workplace_ids)}) excedido (máx 8 horas, atual: {total_linked_duration_today:.1f}h)."}), 400
+    if total_linked_duration_today > 8.0:
+        # Obter nomes dos locais relacionados para mensagem mais clara
+        locais_nomes = []
+        for local_id in linked_workplace_ids:
+            local_details = _get_workplace_details(supabase_client, local_id)
+            if local_details:
+                locais_nomes.append(local_details.get('nome', local_id))
+        
+        return False, jsonify({
+            "sucesso": False, 
+            "mensagem": f"Limite de 8 horas diárias excedido para os locais relacionados ({', '.join(locais_nomes)}). Total atual: {total_linked_duration_today:.1f}h."
+        }), 400
 
     # Rule 3: Grace Period
-    new_app_start_minutes = _time_str_to_minutes(hora_inicio_new_app)
-    new_app_end_minutes = _time_str_to_minutes(hora_fim_new_app)
     grace_period_minutes = int(current_workplace_details.get('periodo_carencia', 60))
 
     immediate_predecessor = None
