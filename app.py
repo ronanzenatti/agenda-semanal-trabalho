@@ -716,19 +716,24 @@ def criar_compromisso(id_agenda):
     except Exception as e:
         return jsonify({"sucesso": False, "mensagem": str(e)}), 400
 
+# app.py
+
 @app.route('/agendas/<id_agenda>/compromissos/<id_compromisso>', methods=['PUT'])
 @requer_autenticacao
 def atualizar_compromisso(id_agenda, id_compromisso):
     dados = request.json
     usuario_id = session['usuario_id']
     
+    print(f"--- INICIANDO ATUALIZAÇÃO DO COMPROMISSO {id_compromisso} ---")
+    print(f"Dados recebidos: {dados}")
+
     try:
         # 1. Verificar se a agenda pertence ao usuário
         agenda_verif = supabase_client.table('agendas').select('id_agenda').eq('id_agenda', id_agenda).eq('usuario_id', usuario_id).maybe_single().execute()
         if not agenda_verif.data:
             return jsonify({"sucesso": False, "mensagem": "Agenda não encontrada ou não pertence ao usuário."}), 404
 
-        # 2. Fetch original compromisso to get all its fields for validation
+        # 2. Buscar dados originais do compromisso
         compromisso_original_resp = supabase_client.table('compromissos')\
             .select('*')\
             .eq('id_compromisso', id_compromisso)\
@@ -736,11 +741,12 @@ def atualizar_compromisso(id_agenda, id_compromisso):
             .maybe_single().execute()
             
         if not compromisso_original_resp.data:
-            return jsonify({"sucesso": False, "mensagem": "Compromisso não encontrado ou não pertence à agenda especificada."}), 404
+            return jsonify({"sucesso": False, "mensagem": "Compromisso não encontrado ou não pertence à agenda."}), 404
         
         compromisso_original_data = compromisso_original_resp.data
+        print(f"Dados originais do compromisso: {compromisso_original_data}")
 
-        # Construct the data to be updated in DB
+        # 3. Preparar os dados para o banco de dados (apenas o que foi enviado)
         atualizacao_para_db = {}
         campos_permitidos_db = ['local_id', 'dia_semana', 'hora_inicio', 'hora_fim',
                                 'descricao', 'tipo_hora', 'duracao']
@@ -748,17 +754,11 @@ def atualizar_compromisso(id_agenda, id_compromisso):
             if campo in dados:
                 atualizacao_para_db[campo] = dados.get(campo)
         
-        if not atualizacao_para_db: # No actual fields to update that are allowed
+        if not atualizacao_para_db:
             return jsonify({"sucesso": False, "mensagem": "Nenhum dado válido fornecido para atualização."}), 400
 
-        # 3. If local_id is being changed, verify ownership of the new local_id
-        if 'local_id' in atualizacao_para_db and atualizacao_para_db['local_id'] != compromisso_original_data['local_id']:
-            novo_local_details = _get_workplace_details(supabase_client, atualizacao_para_db['local_id'])
-            if not novo_local_details or novo_local_details.get('usuario_id') != usuario_id:
-                 return jsonify({"sucesso": False, "mensagem": "Novo local de trabalho não encontrado ou não pertence ao usuário."}), 403
-
-        # >>> BEGIN BUSINESS LOGIC VALIDATION FOR UPDATE <<<
-        # Construct the state of the appointment *as if* the update was applied
+        # 4. Construir o estado futuro do compromisso para validação
+        #    Usando o dado novo se existir, senão, o original.
         dados_para_validar = {
             "local_id": atualizacao_para_db.get('local_id', compromisso_original_data['local_id']),
             "dia_semana": int(atualizacao_para_db.get('dia_semana', compromisso_original_data['dia_semana'])),
@@ -766,42 +766,41 @@ def atualizar_compromisso(id_agenda, id_compromisso):
             "hora_fim": atualizacao_para_db.get('hora_fim', compromisso_original_data['hora_fim']),
             "duracao": float(atualizacao_para_db.get('duracao', compromisso_original_data['duracao']))
         }
+        print(f"Dados que serão usados para a validação: {dados_para_validar}")
 
-        # Ensure all fields needed for validation are present
-        for campo_key_val in ['local_id', 'dia_semana', 'hora_inicio', 'hora_fim', 'duracao']:
-            if dados_para_validar.get(campo_key_val) is None:
-                 return jsonify({"sucesso": False, "mensagem": f"Campo '{campo_key_val}' é obrigatório para validação e não pode ser nulo (original ou atualizado)."}), 400
+        # 5. EXECUTAR A VALIDAÇÃO (REMOVIDA A CONDICIONAL 'needs_validation')
+        is_valid, error_response, status_code = _validate_appointment(
+            supabase_client,
+            id_agenda,
+            dados_para_validar,
+            usuario_id,
+            existing_appointment_id=id_compromisso
+        )
+        if not is_valid:
+            print(f"VALIDAÇÃO FALHOU: {error_response.get_json()}")
+            return error_response, status_code
         
-        fields_affecting_validation = ['local_id', 'dia_semana', 'hora_inicio', 'hora_fim', 'duracao']
-        needs_validation = any(field in atualizacao_para_db for field in fields_affecting_validation)
+        print("--- VALIDAÇÃO CONCLUÍDA COM SUCESSO ---")
 
-        if needs_validation:
-            is_valid, error_response, status_code = _validate_appointment(
-                supabase_client,
-                id_agenda,
-                dados_para_validar,
-                usuario_id,
-                existing_appointment_id=id_compromisso
-            )
-            if not is_valid:
-                return error_response, status_code
-        # >>> END BUSINESS LOGIC VALIDATION FOR UPDATE <<<
-
+        # 6. Se a validação passou, atualizar o banco de dados
         resposta = supabase_client.table('compromissos')\
             .update(atualizacao_para_db)\
             .eq('id_compromisso', id_compromisso)\
             .execute()
         
         if resposta.data:
+            print(f"Compromisso {id_compromisso} atualizado com sucesso no DB.")
             return jsonify({"sucesso": True, "compromisso": resposta.data[0]})
         else:
-            error_message = "Erro ao atualizar compromisso."
+            error_message = "Erro ao atualizar compromisso no DB."
             if hasattr(resposta, 'error') and resposta.error and hasattr(resposta.error, 'message'):
                 error_message = resposta.error.message
+            print(f"ERRO NO DB: {error_message}")
             return jsonify({"sucesso": False, "mensagem": error_message}), 400
 
     except Exception as e:
-        return jsonify({"sucesso": False, "mensagem": str(e)}), 400
+        print(f"ERRO INESPERADO: {str(e)}")
+        return jsonify({"sucesso": False, "mensagem": str(e)}), 500
 
 @app.route('/agendas/<id_agenda>/compromissos/<id_compromisso>', methods=['DELETE'])
 @requer_autenticacao
@@ -1379,7 +1378,6 @@ def _generate_report_data(id_agenda_verified, supabase_client, usuario_id):
     except Exception as e:
         print(f"Error generating report data for agenda {id_agenda_verified}: {e}")
         return {"locais": [], "total_horas": 0.0, "total_valor": 0.0, "erros": [f"Erro interno ao gerar relatório: {str(e)}"]}
-
 
 # API de Relatórios
 @app.route('/agendas/<id_agenda>/relatorios/semanal', methods=['GET'])
