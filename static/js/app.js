@@ -200,36 +200,6 @@ function mostrarSeletorAgendaParaCompartilhar(agendas) {
     });
 }
 
-// Nova função para obter link de compartilhamento
-function obterLinkCompartilhamento(agendaId) {
-    fetch(`/agendas/${agendaId}/public_link`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.sucesso && data.link_publico_id) {
-                // Criar o link de compartilhamento
-                const shareLink = `${window.location.origin}/public/agenda/${data.link_publico_id}`;
-                document.getElementById('shareLink').value = shareLink;
-                
-                // Abrir o modal
-                document.getElementById('shareModal').classList.remove('hidden');
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Erro',
-                    text: 'Não foi possível obter o link de compartilhamento.'
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Erro ao obter link de compartilhamento:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Erro',
-                text: 'Falha ao gerar link de compartilhamento.'
-            });
-        });
-}
-
 // Função para fechar o modal de compartilhamento
 function closeShareModal() {
     document.getElementById('shareModal').classList.add('hidden');
