@@ -45,10 +45,6 @@
                         class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 font-bold text-sm md:text-base">
                         <i class="fas fa-building mr-2"></i>Locais de Trabalho
                     </button>
-                    <button onclick="openConfigModal()"
-                        class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 font-bold text-sm md:text-base">
-                        Configurações
-                    </button>
                     <button onclick="openAppointmentModal()"
                         class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 font-bold text-sm md:text-base">
                         Novo Compromisso <i class="fas fa-calendar-plus ml-2"></i>
@@ -130,10 +126,6 @@
                 class="bg-blue-500 text-white px-4 py-3 rounded hover:bg-blue-600 font-bold w-full text-left">
                 <i class="fas fa-building mr-2"></i>Locais de Trabalho
             </button>
-            <button onclick="openConfigModal(); closeMenu();"
-                class="bg-purple-500 text-white px-4 py-3 rounded hover:bg-purple-600 font-bold w-full text-left">
-                <i class="fas fa-cog mr-2"></i>Configurações
-            </button>
             <button onclick="openAppointmentModal(); closeMenu();"
                 class="bg-green-500 text-white px-4 py-3 rounded hover:bg-green-600 font-bold w-full text-left">
                 <i class="fas fa-calendar-plus mr-2"></i>Novo Compromisso
@@ -153,67 +145,6 @@
             </button>
         </div>
     </div>
-
-    <!-- Modal Configurações -->
-    <div id="configModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="bg-white p-4 md:p-6 rounded-lg w-[95%] md:w-[600px] max-h-[90vh] overflow-y-auto">
-            <h2 class="text-xl font-bold mb-4">Configurações</h2>
-            <form id="configForm">
-                <div class="mb-4">
-                    <label class="block mb-2 font-bold">Dias da Semana para Exibir</label>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-1">
-                        <label class="inline-flex items-center justify-items-start">
-                            <input type="checkbox" name="daysToShow" value="1" class="mr-1" checked>
-                            Segunda
-                        </label>
-                        <label class="inline-flex items-center justify-items-start">
-                            <input type="checkbox" name="daysToShow" value="2" class="mr-1" checked>
-                            Terça
-                        </label>
-                        <label class="inline-flex items-center justify-items-start">
-                            <input type="checkbox" name="daysToShow" value="3" class="mr-1" checked>
-                            Quarta
-                        </label>
-                        <label class="inline-flex items-center justify-items-start">
-                            <input type="checkbox" name="daysToShow" value="4" class="mr-1" checked>
-                            Quinta
-                        </label>
-                        <label class="inline-flex items-center justify-items-start">
-                            <input type="checkbox" name="daysToShow" value="5" class="mr-1" checked>
-                            Sexta
-                        </label>
-                        <label class="inline-flex items-center justify-items-start">
-                            <input type="checkbox" name="daysToShow" value="6" class="mr-1" checked>
-                            Sábado
-                        </label>
-                        <label class="inline-flex items-center justify-items-start">
-                            <input type="checkbox" name="daysToShow" value="0" class="mr-2">
-                            Domingo
-                        </label>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="mb-4">
-                        <label class="block mb-2 font-bold">Horário Padrão de Início</label>
-                        <input type="time" id="defaultStartTime" class="w-full p-2 border rounded text-center"
-                            value="07:00">
-                    </div>
-                    <div class="mb-4">
-                        <label class="block mb-2 font-bold">Horário Padrão de Término</label>
-                        <input type="time" id="defaultEndTime" class="w-full p-2 border rounded text-center"
-                            value="23:00">
-                    </div>
-                </div>
-                <div class="flex justify-between">
-                    <button type="button" onclick="closeConfigModal()"
-                        class=" bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancelar</button>
-                    <button type="submit"
-                        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Salvar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- Modal Locais de Trabalho -->
     <div id="workplaceModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
         <div class="bg-white p-4 md:p-6 rounded-lg w-[95%] md:w-[800px] max-h-[90vh] overflow-y-auto">
@@ -498,28 +429,34 @@
 
     <div id="shareModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white p-4 md:p-6 rounded-lg w-[95%] md:w-[600px] max-h-[90vh] overflow-y-auto">
-            <h2 class="text-xl font-bold mb-4">Compartilhar Sua Agenda</h2>
-            <p class="mb-4">Compartilhe sua agenda semanal com outras pessoas através do link abaixo:</p>
+            <h2 class="text-xl font-bold mb-4">Compartilhar Agenda</h2>
+            <p class="mb-4">Use o link abaixo para compartilhar sua agenda. Qualquer pessoa com este link poderá
+                visualizar os compromissos desta agenda.</p>
 
-            <div class="flex items-center mb-6">
-                <input type="text" id="shareLink" class="flex-grow p-2 border rounded-l" readonly>
-                <button onclick="copyShareLink()"
-                    class="bg-blue-500 text-white p-2 rounded-r border-blue-500 hover:bg-blue-600">
-                    <i class="fas fa-copy"></i>
-                </button>
+            <div class="bg-blue-50 border border-blue-200 rounded p-3 mb-4">
+                <p class="text-sm text-blue-800">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Este link permite visualização pública sem necessidade de login. Os valores financeiros não serão
+                    exibidos.
+                </p>
             </div>
 
             <div class="flex items-center mb-6">
-                <div class="flex-grow">
-                    <p class="text-sm text-gray-600">O link permite que qualquer pessoa visualize sua agenda sem
-                        precisar fazer login.</p>
-                </div>
+                <input type="text" id="shareLink" class="flex-grow p-2 border rounded-l" readonly
+                    placeholder="Selecione uma agenda para gerar o link">
+                <button onclick="copyShareLink()"
+                    class="bg-blue-500 text-white p-2 rounded-r border-blue-500 hover:bg-blue-600 disabled:bg-gray-400"
+                    id="copyLinkBtn" disabled>
+                    <i class="fas fa-copy"></i>
+                </button>
             </div>
 
             <div class="flex justify-between">
                 <button onclick="closeShareModal()"
                     class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Fechar</button>
-                <button onclick="copyShareLink()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                <button onclick="copyShareLink()"
+                    class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
+                    id="copyLinkBtn2" disabled>
                     <i class="fas fa-copy mr-2"></i>Copiar Link
                 </button>
             </div>

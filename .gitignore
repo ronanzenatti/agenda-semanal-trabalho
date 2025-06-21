@@ -6,7 +6,7 @@ virtualenv/
 .venv/
 
 # Arquivos de ambiente e configuração
-
+.env
 .env.local
 .env.development
 .env.production

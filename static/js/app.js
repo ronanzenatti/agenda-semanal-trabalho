@@ -133,18 +133,75 @@ export function atualizarDadosGlobais(tipo, dados) {
 
 // Função para abrir o modal de compartilhamento
 function shareCalendar() {
-    const agendaId = getActiveScheduleId();
-
-    if (!agendaId) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Atenção',
-            text: 'Selecione uma agenda antes de compartilhar.'
+    // Primeiro, buscar todas as agendas do usuário
+    fetch('/agendas')
+        .then(response => response.json())
+        .then(data => {
+            if (data.sucesso && data.agendas && data.agendas.length > 0) {
+                // Se houver múltiplas agendas, mostrar seletor
+                if (data.agendas.length > 1) {
+                    mostrarSeletorAgendaParaCompartilhar(data.agendas);
+                } else {
+                    // Se houver apenas uma agenda, compartilhar diretamente
+                    obterLinkCompartilhamento(data.agendas[0].id_agenda);
+                }
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Atenção',
+                    text: 'Você não possui nenhuma agenda para compartilhar. Crie uma agenda primeiro.'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao buscar agendas:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: 'Falha ao buscar suas agendas.'
+            });
         });
-        return;
-    }
+}
 
-    // Obter link público da agenda
+// Nova função para mostrar seletor de agenda
+function mostrarSeletorAgendaParaCompartilhar(agendas) {
+    // Criar opções HTML para o select
+    const opcoes = agendas.map(agenda => {
+        const dataInicio = new Date(agenda.data_inicio).toLocaleDateString('pt-BR');
+        const dataFim = new Date(agenda.data_fim).toLocaleDateString('pt-BR');
+        return `<option value="${agenda.id_agenda}">${agenda.nome} (${dataInicio} - ${dataFim})</option>`;
+    }).join('');
+
+    Swal.fire({
+        title: 'Selecione a Agenda',
+        html: `
+            <p class="mb-4">Escolha qual agenda você deseja compartilhar:</p>
+            <select id="agendaParaCompartilhar" class="w-full p-2 border rounded">
+                ${opcoes}
+            </select>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Compartilhar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        preConfirm: () => {
+            const agendaId = document.getElementById('agendaParaCompartilhar').value;
+            if (!agendaId) {
+                Swal.showValidationMessage('Por favor, selecione uma agenda');
+                return false;
+            }
+            return agendaId;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            obterLinkCompartilhamento(result.value);
+        }
+    });
+}
+
+// Nova função para obter link de compartilhamento
+function obterLinkCompartilhamento(agendaId) {
     fetch(`/agendas/${agendaId}/public_link`)
         .then(response => response.json())
         .then(data => {
@@ -152,7 +209,7 @@ function shareCalendar() {
                 // Criar o link de compartilhamento
                 const shareLink = `${window.location.origin}/public/agenda/${data.link_publico_id}`;
                 document.getElementById('shareLink').value = shareLink;
-
+                
                 // Abrir o modal
                 document.getElementById('shareModal').classList.remove('hidden');
             } else {
@@ -181,6 +238,19 @@ function closeShareModal() {
 // Função para copiar o link para a área de transferência
 function copyShareLink() {
     const linkInput = document.getElementById('shareLink');
+    
+    // Verificar se há um link válido
+    if (!linkInput.value || linkInput.value === 'Selecione uma agenda para gerar o link') {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Atenção',
+            text: 'Selecione uma agenda primeiro para gerar o link de compartilhamento.',
+            timer: 2000,
+            showConfirmButton: false
+        });
+        return;
+    }
+    
     linkInput.select();
     linkInput.setSelectionRange(0, 99999); // Para dispositivos móveis
 
@@ -207,6 +277,62 @@ function copyShareLink() {
                 showConfirmButton: false
             });
         });
+}
+
+// Adicionar função para habilitar botões de cópia quando há link
+function habilitarBotoesCopia() {
+    const copyBtn1 = document.getElementById('copyLinkBtn');
+    const copyBtn2 = document.getElementById('copyLinkBtn2');
+    const linkInput = document.getElementById('shareLink');
+    
+    if (linkInput.value && linkInput.value !== 'Selecione uma agenda para gerar o link') {
+        if (copyBtn1) copyBtn1.disabled = false;
+        if (copyBtn2) copyBtn2.disabled = false;
+    } else {
+        if (copyBtn1) copyBtn1.disabled = true;
+        if (copyBtn2) copyBtn2.disabled = true;
+    }
+}
+
+// Modificar obterLinkCompartilhamento para habilitar botões
+function obterLinkCompartilhamento(agendaId) {
+    fetch(`/agendas/${agendaId}/public_link`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.sucesso && data.link_publico_id) {
+                // Criar o link de compartilhamento
+                const shareLink = `${window.location.origin}/public/agenda/${data.link_publico_id}`;
+                document.getElementById('shareLink').value = shareLink;
+                
+                // Habilitar botões de cópia
+                habilitarBotoesCopia();
+                
+                // Abrir o modal
+                document.getElementById('shareModal').classList.remove('hidden');
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: 'Não foi possível obter o link de compartilhamento.'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao obter link de compartilhamento:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: 'Falha ao gerar link de compartilhamento.'
+            });
+        });
+}
+
+// Modificar closeShareModal para limpar o estado
+function closeShareModal() {
+    document.getElementById('shareModal').classList.add('hidden');
+    // Limpar o input e desabilitar botões
+    document.getElementById('shareLink').value = 'Selecione uma agenda para gerar o link';
+    habilitarBotoesCopia();
 }
 
 // Expor funções para uso global/janela

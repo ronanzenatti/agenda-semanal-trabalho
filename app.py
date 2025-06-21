@@ -1244,7 +1244,7 @@ def obter_link_publico_agenda(id_agenda):
     except Exception as e:
         return jsonify({"sucesso": False, "mensagem": f"Erro ao obter link público: {str(e)}"}), 500
 
-@app.route('/public/agenda/<link_publico_id>', methods=['GET'])
+@app.route('/api/public/agenda/<link_publico_id>', methods=['GET'])
 def obter_dados_agenda_publica(link_publico_id):
     try:
         # 1. Encontrar agenda pelo link_publico_id
@@ -1292,6 +1292,53 @@ def obter_dados_agenda_publica(link_publico_id):
     except Exception as e:
         print(f"Erro ao buscar dados da agenda pública {link_publico_id}: {str(e)}")
         return jsonify({"sucesso": False, "mensagem": "Erro interno ao processar a solicitação da agenda pública."}), 500
+
+@app.route('/public/agenda/<link_publico_id>')
+def visualizar_agenda_publica(link_publico_id):
+    """Renderiza a página HTML da agenda pública compartilhada"""
+    try:
+        # 1. Encontrar agenda pelo link_publico_id
+        agenda_resp = supabase_client.table('agendas').select('id_agenda, nome, dias_semana, hora_inicio_padrao, hora_fim_padrao, usuario_id').eq('link_publico_id', link_publico_id).maybe_single().execute()
+        
+        if not agenda_resp.data:
+            return render_template('erro.html', mensagem="Agenda não encontrada"), 404
+
+        agenda_data = agenda_resp.data
+        agenda_id = agenda_data['id_agenda']
+        proprietario_id = agenda_data['usuario_id']
+
+        # 2. Buscar compromissos associados
+        compromissos_resp = supabase_client.table('compromissos').select('dia_semana, hora_inicio, hora_fim, descricao, local_id, duracao').eq('agenda_id', agenda_id).execute()
+        compromissos_publicos = compromissos_resp.data if compromissos_resp.data else []
+
+        # 3. Buscar locais de trabalho do proprietário da agenda
+        locais_resp = supabase_client.table('locais_trabalho').select('id_local, nome, cor').eq('usuario_id', proprietario_id).execute()
+        locais_map = {local['id_local']: {"nome": local['nome'], "cor": local['cor']} for local in (locais_resp.data if locais_resp.data else [])}
+
+        # 4. Calcular total de horas por local
+        total_horas_por_local = {}
+        for comp in compromissos_publicos:
+            local_id = comp['local_id']
+            duracao = float(comp.get('duracao', 0))
+            if local_id not in total_horas_por_local:
+                total_horas_por_local[local_id] = 0.0
+            total_horas_por_local[local_id] += duracao
+
+        # 5. Renderizar template HTML
+        return render_template(
+            'agenda_publica_compartilhada.html',
+            agenda_nome=agenda_data['nome'],
+            dias_semana=agenda_data['dias_semana'],
+            hora_inicio_padrao=agenda_data['hora_inicio_padrao'],
+            hora_fim_padrao=agenda_data['hora_fim_padrao'],
+            compromissos=compromissos_publicos,
+            locais_map=locais_map,
+            total_horas_por_local={lid: round(horas, 1) for lid, horas in total_horas_por_local.items()}
+        )
+
+    except Exception as e:
+        print(f"Erro ao buscar dados da agenda pública {link_publico_id}: {str(e)}")
+        return render_template('erro.html', mensagem="Erro ao carregar agenda compartilhada"), 500
 
 # Helper function for generating report data
 def _generate_report_data(id_agenda_verified, supabase_client, usuario_id):
@@ -1431,6 +1478,62 @@ def relatorio_mensal(id_agenda):
 
     except Exception as e:
         return jsonify({"sucesso": False, "mensagem": f"Erro ao gerar relatório mensal: {str(e)}"}), 500
+
+@app.route('/public/agenda/<link_publico_id>')
+def visualizar_agenda_compartilhada(link_publico_id):
+    try:
+        # 1. Encontrar agenda pelo link_publico_id
+        agenda_resp = supabase_client.table('agendas').select('id_agenda, nome, dias_semana, hora_inicio_padrao, hora_fim_padrao, usuario_id').eq('link_publico_id', link_publico_id).maybe_single().execute()
+        
+        if not agenda_resp.data:
+            return render_template('erro.html', mensagem="Agenda compartilhada não encontrada."), 404
+
+        agenda_data = agenda_resp.data
+        agenda_id = agenda_data['id_agenda']
+        proprietario_id = agenda_data['usuario_id']
+
+        # 2. Buscar informações do proprietário
+        proprietario_resp = supabase_client.table('usuarios').select('nome, cpf').eq('id_usuario', proprietario_id).maybe_single().execute()
+        if not proprietario_resp.data:
+            proprietario_info = {'nome': 'Usuário', 'cpf': '000.000.000-00'}
+        else:
+            proprietario_info = proprietario_resp.data
+
+        # 3. Buscar compromissos associados
+        compromissos_resp = supabase_client.table('compromissos').select('*').eq('agenda_id', agenda_id).execute()
+        compromissos_publicos = compromissos_resp.data if compromissos_resp.data else []
+
+        # 4. Buscar locais de trabalho do proprietário da agenda
+        locais_resp = supabase_client.table('locais_trabalho').select('id_local, nome, cor').eq('usuario_id', proprietario_id).execute()
+        locais_map = {local['id_local']: {"nome": local['nome'], "cor": local['cor']} for local in (locais_resp.data if locais_resp.data else [])}
+
+        # 5. Calcular total de horas por local
+        total_horas_por_local = {}
+        for comp in compromissos_publicos:
+            local_id = comp['local_id']
+            duracao = float(comp.get('duracao', 0))
+            if local_id not in total_horas_por_local:
+                total_horas_por_local[local_id] = 0.0
+            total_horas_por_local[local_id] += duracao
+
+        # Arredondar totais
+        total_horas_por_local = {lid: round(horas, 1) for lid, horas in total_horas_por_local.items()}
+
+        return render_template(
+            'agenda_compartilhada.html',
+            agenda_nome=agenda_data['nome'],
+            dias_semana=agenda_data['dias_semana'],
+            hora_inicio_padrao=agenda_data['hora_inicio_padrao'],
+            hora_fim_padrao=agenda_data['hora_fim_padrao'],
+            compromissos=compromissos_publicos,
+            locais_map=locais_map,
+            total_horas_por_local=total_horas_por_local,
+            proprietario=proprietario_info
+        )
+
+    except Exception as e:
+        print(f"Erro ao buscar dados da agenda compartilhada {link_publico_id}: {str(e)}")
+        return render_template('erro.html', mensagem="Erro ao processar a agenda compartilhada."), 500
 
 if __name__ == '__main__':
     app.run()
