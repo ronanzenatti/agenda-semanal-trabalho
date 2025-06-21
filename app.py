@@ -716,8 +716,6 @@ def criar_compromisso(id_agenda):
     except Exception as e:
         return jsonify({"sucesso": False, "mensagem": str(e)}), 400
 
-# app.py
-
 @app.route('/agendas/<id_agenda>/compromissos/<id_compromisso>', methods=['PUT'])
 @requer_autenticacao
 def atualizar_compromisso(id_agenda, id_compromisso):
@@ -768,13 +766,13 @@ def atualizar_compromisso(id_agenda, id_compromisso):
         }
         print(f"Dados que serão usados para a validação: {dados_para_validar}")
 
-        # 5. EXECUTAR A VALIDAÇÃO (REMOVIDA A CONDICIONAL 'needs_validation')
+        # 5. SEMPRE EXECUTAR A VALIDAÇÃO
         is_valid, error_response, status_code = _validate_appointment(
             supabase_client,
             id_agenda,
             dados_para_validar,
             usuario_id,
-            existing_appointment_id=id_compromisso
+            existing_appointment_id=id_compromisso  # IMPORTANTE: passar o ID do compromisso sendo editado
         )
         if not is_valid:
             print(f"VALIDAÇÃO FALHOU: {error_response.get_json()}")
