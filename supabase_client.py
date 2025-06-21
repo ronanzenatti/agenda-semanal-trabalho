@@ -15,7 +15,7 @@ is_vercel = os.getenv('VERCEL_ENV') is not None
 # Verificar se as variáveis foram carregadas
 if not SUPABASE_URL or not SUPABASE_KEY:
     error_msg = (
-        "As variáveis de ambiente SUPABASE_URL e SUPABASE_KEY são obrigatórias.\n"
+        "As variáveis de ambiente SUPABASE_URL e SUPABASE_KEY são obrigatórias.\n " + os.getenv('SUPABASE_URL')
     )
     
     if is_vercel:
