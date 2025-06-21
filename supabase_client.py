@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Configuração do cliente Supabase
-SUPABASE_URL = os.getenv('SUPABASE_URL')
-SUPABASE_KEY = os.getenv('SUPABASE_KEY')
+SUPABASE_URL = os.getenv('SUPABASE_SUPABASE_URL')
+SUPABASE_KEY = os.getenv('SUPABASE_SUPABASE_KEY')
 
 # Criar cliente
 supabase_client = create_client(SUPABASE_URL, SUPABASE_KEY)
