@@ -12,6 +12,7 @@ import * as config from './config.js';
 import * as reports from './reports.js';
 import * as responsive from './responsive.js';
 import * as utils from './utils.js';
+import { initSchedules, getActiveScheduleId } from './schedules.js';
 
 // Variáveis Globais compartilhadas entre módulos - exportadas para acesso em outros arquivos
 export let compromissos = [];
@@ -74,6 +75,11 @@ function carregarDados() {
         .then(() => {
             // Inicializar calendário após carregar configurações
             calendar.inicializarCalendario();
+
+            // Inicializar UI de Horários (Schedules) se o seletor estiver presente
+            if (document.getElementById('activeScheduleSelector')) {
+                initSchedules(); // Não precisa ser `await` se não retorna Promise bloqueante
+            }
 
             // Carregar locais de trabalho
             return workplaces.carregarLocaisTrabalho();

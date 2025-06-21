@@ -38,9 +38,8 @@ export function atualizarInterfaceLocaisTrabalho() {
             localElement.innerHTML = `
                 <div>
                     <strong>${local.nome}</strong>
-                    <p class="text-sm">Valor/Hora: R$ ${parseFloat(local.valor_hora).toFixed(2)} | 
-                       Acréscimo HA: ${local.acrescimo_ha_percent}% | 
-                       Carência: ${local.periodo_carencia} min</p>
+                    <p class="text-sm">Acréscimo HA: ${local.acrescimo_ha_percent || 0}% |
+                       Carência: ${local.periodo_carencia || 0} min</p>
                 </div>
                 <div class="flex gap-2">
                     <button onclick="editarLocalTrabalho('${local.id_local}')" class="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600">
@@ -100,7 +99,6 @@ export function mostrarFormularioLocalTrabalho() {
     document.getElementById('workplaceId').value = '';
     document.getElementById('workplaceName').value = '';
     document.getElementById('workplaceColor').value = '#' + Math.floor(Math.random()*16777215).toString(16); // Cor aleatória
-    document.getElementById('workplaceHourRate').value = '';
     document.getElementById('workplaceBonus').value = '0';
     document.getElementById('workplaceGrace').value = '60';
     document.getElementById('workplaceRelated').value = '';
@@ -122,7 +120,6 @@ export function editarLocalTrabalho(idLocal) {
     document.getElementById('workplaceId').value = local.id_local;
     document.getElementById('workplaceName').value = local.nome;
     document.getElementById('workplaceColor').value = local.cor;
-    document.getElementById('workplaceHourRate').value = local.valor_hora;
     document.getElementById('workplaceBonus').value = local.acrescimo_ha_percent;
     document.getElementById('workplaceGrace').value = local.periodo_carencia;
     document.getElementById('workplaceRelated').value = local.relacionado_com || '';
@@ -138,9 +135,8 @@ export function salvarLocalTrabalho(e) {
     const dados = {
         nome: document.getElementById('workplaceName').value,
         cor: document.getElementById('workplaceColor').value,
-        valor_hora: parseFloat(document.getElementById('workplaceHourRate').value),
-        acrescimo_ha_percent: parseInt(document.getElementById('workplaceBonus').value),
-        periodo_carencia: parseInt(document.getElementById('workplaceGrace').value),
+        acrescimo_ha_percent: parseInt(document.getElementById('workplaceBonus').value) || 0,
+        periodo_carencia: parseInt(document.getElementById('workplaceGrace').value) || 0,
         relacionado_com: document.getElementById('workplaceRelated').value || null
     };
     
