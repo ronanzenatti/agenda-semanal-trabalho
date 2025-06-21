@@ -79,7 +79,7 @@ def _get_appointments_for_validation(supabase_client, agenda_id, dia_semana, exc
     try:
         query = supabase_client.table('compromissos').select('id_compromisso, local_id, hora_inicio, hora_fim, duracao').eq('agenda_id', agenda_id).eq('dia_semana', int(dia_semana)).order('hora_inicio', desc=False)
         if exclude_id:
-            query = query.not_eq('id_compromisso', exclude_id)
+            query = query.neq('id_compromisso', exclude_id)  # Mudança: usar neq ao invés de not_eq
         response = query.execute()
         return response.data if response.data else []
     except Exception as e:
@@ -101,40 +101,43 @@ def _validate_appointment(supabase_client, agenda_id, appointment_data, usuario_
     except (TypeError, ValueError) as e:
         return False, jsonify({"sucesso": False, "mensagem": f"Dados inválidos para validação: {str(e)}"}), 400
 
-
     # Rule 1: Continuous Work Limit (max 6 hours)
     if duracao_new_app > 6.0:
         return False, jsonify({"sucesso": False, "mensagem": "Limite de trabalho contínuo excedido (máx 6 horas)."}), 400
 
     current_workplace_details = _get_workplace_details(supabase_client, local_id_new_app)
     if not current_workplace_details:
-        return False, jsonify({"sucesso": False, "mensagem": "Local de trabalho do compromisso não encontrado para validação."}), 400 # Should be 400 as it's bad input data
+        return False, jsonify({"sucesso": False, "mensagem": "Local de trabalho do compromisso não encontrado para validação."}), 400
 
-    # Get existing appointments for the day
+    # Get existing appointments for the day (excluding the one being edited)
     existing_appointments_today = _get_appointments_for_validation(supabase_client, agenda_id, dia_semana_new_app, exclude_id=existing_appointment_id)
 
     # CORREÇÃO 1: Verificar sobreposição de horários independente do local
     new_app_start_minutes = _time_str_to_minutes(hora_inicio_new_app)
     new_app_end_minutes = _time_str_to_minutes(hora_fim_new_app)
     
+    # Debug
+    print(f"Validando compromisso - Horário: {hora_inicio_new_app} às {hora_fim_new_app}")
+    print(f"Existing appointment ID being edited: {existing_appointment_id}")
+    print(f"Total de compromissos existentes no dia (excluindo o atual): {len(existing_appointments_today)}")
+    
     for app in existing_appointments_today:
         app_start = _time_str_to_minutes(app['hora_inicio'])
         app_end = _time_str_to_minutes(app['hora_fim'])
         
+        print(f"Verificando conflito com compromisso {app['id_compromisso']}: {app['hora_inicio']} às {app['hora_fim']}")
+        
         # Verificar se há sobreposição de horários
-        # Sobreposição ocorre quando:
-        # 1. O novo compromisso começa durante um existente
-        # 2. O novo compromisso termina durante um existente
-        # 3. O novo compromisso engloba completamente um existente
-        # 4. Um existente engloba completamente o novo compromisso
         if (new_app_start_minutes < app_end and new_app_end_minutes > app_start):
             return False, jsonify({
                 "sucesso": False, 
                 "mensagem": f"Conflito de horário: já existe um compromisso das {app['hora_inicio']} às {app['hora_fim']}."
             }), 400
 
-    # CORREÇÃO 2: Limite de 8 horas diárias - somar DURAÇÃO em vez de calcular pela diferença de horários
+    # CORREÇÃO 2: Limite de 8 horas diárias - somar DURAÇÃO
     linked_workplace_ids = _get_linked_workplace_ids(supabase_client, local_id_new_app, usuario_id)
+    
+    print(f"Locais relacionados encontrados: {linked_workplace_ids}")
     
     # Iniciar com a duração do novo compromisso
     total_linked_duration_today = duracao_new_app
@@ -142,7 +145,11 @@ def _validate_appointment(supabase_client, agenda_id, appointment_data, usuario_
     # Somar as durações dos compromissos existentes em locais relacionados
     for app in existing_appointments_today:
         if app['local_id'] in linked_workplace_ids:
-            total_linked_duration_today += float(app['duracao'])
+            app_duration = float(app['duracao'])
+            total_linked_duration_today += app_duration
+            print(f"Somando duração do compromisso {app['id_compromisso']}: {app_duration}h (Total parcial: {total_linked_duration_today}h)")
+
+    print(f"Total de horas em locais relacionados: {total_linked_duration_today}h")
 
     if total_linked_duration_today > 8.0:
         # Obter nomes dos locais relacionados para mensagem mais clara
@@ -178,16 +185,10 @@ def _validate_appointment(supabase_client, agenda_id, appointment_data, usuario_
         if immediate_predecessor['local_id'] != local_id_new_app:
             predecessor_workplace_details = _get_workplace_details(supabase_client, immediate_predecessor['local_id'])
             if predecessor_workplace_details:
-                # Are they part of the same linked group?
-                # If current_wp is linked to predecessor_wp OR predecessor_wp is linked to current_wp
-                # This means they share a common 'relacionado_com' or one is 'relacionado_com' of other.
-                # Using the sets:
                 predecessor_linked_ids = _get_linked_workplace_ids(supabase_client, immediate_predecessor['local_id'], usuario_id)
-                # If there's any intersection, they are considered related for grace period.
-                # Or, more simply, if the two local_ids are in the same group derived from local_id_new_app
                 are_linked_for_grace = immediate_predecessor['local_id'] in linked_workplace_ids
 
-                if not are_linked_for_grace: # Only apply grace if NOT linked
+                if not are_linked_for_grace:
                     gap = new_app_start_minutes - _time_str_to_minutes(immediate_predecessor['hora_fim'])
                     if gap < grace_period_minutes:
                         return False, jsonify({"sucesso": False, "mensagem": f"Violação do período de carência com o compromisso anterior. Gap de {gap} min, necessário {grace_period_minutes} min."}), 400
@@ -199,7 +200,7 @@ def _validate_appointment(supabase_client, agenda_id, appointment_data, usuario_
                 successor_linked_ids = _get_linked_workplace_ids(supabase_client, immediate_successor['local_id'], usuario_id)
                 are_linked_for_grace = immediate_successor['local_id'] in linked_workplace_ids
 
-                if not are_linked_for_grace: # Only apply grace if NOT linked
+                if not are_linked_for_grace:
                     gap = _time_str_to_minutes(immediate_successor['hora_inicio']) - new_app_end_minutes
                     if gap < grace_period_minutes:
                         return False, jsonify({"sucesso": False, "mensagem": f"Violação do período de carência com o compromisso seguinte. Gap de {gap} min, necessário {grace_period_minutes} min."}), 400
@@ -224,7 +225,7 @@ def _validate_appointment(supabase_client, agenda_id, appointment_data, usuario_
         if rest_duration_with_next < 11 * 60:
             return False, jsonify({"sucesso": False, "mensagem": "Violação do período de descanso inter-jornada (com o primeiro compromisso do dia seguinte)."}), 400
 
-    return True, None, None # Valid
+    return True, None, None
 
 
 app = Flask(__name__)
