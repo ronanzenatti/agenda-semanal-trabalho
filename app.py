@@ -7,7 +7,7 @@ from datetime import timedelta
 import copy
 
 # Carregar variáveis de ambiente
-load_dotenv()
+# load_dotenv()
 
 # Helper Functions for Appointment Validation
 def _time_str_to_minutes(time_str):
