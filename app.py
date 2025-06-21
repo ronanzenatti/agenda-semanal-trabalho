@@ -1409,4 +1409,4 @@ def relatorio_mensal(id_agenda):
         return jsonify({"sucesso": False, "mensagem": f"Erro ao gerar relatório mensal: {str(e)}"}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
