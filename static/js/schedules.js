@@ -681,6 +681,11 @@ export function getActiveScheduleId() {
     return agendaAtiva ? agendaAtiva.id_agenda : null;
 }
 
+// Exportar função para obter a agenda ativa completa
+export function getActiveSchedule() {
+    return agendaAtiva;
+}
+
 // Restaurar agenda ativa do sessionStorage ao carregar
 const agendaAtivaId = sessionStorage.getItem('agendaAtivaId');
 if (agendaAtivaId) {
