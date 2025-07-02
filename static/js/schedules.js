@@ -42,7 +42,7 @@ function configurarEventListeners() {
     // Botão clonar agenda
     const cloneScheduleBtn = document.getElementById('cloneScheduleBtn');
     if (cloneScheduleBtn) {
-        cloneScheduleBtn.addEventListener('click', mostrarModalClonagem);
+        cloneScheduleBtn.addEventListener('click', mostrarFormularioClonagem);
     }
 
     // Formulário de nova agenda
@@ -306,6 +306,161 @@ function salvarAgenda(e) {
                 text: 'Falha ao comunicar com o servidor'
             });
         });
+}
+
+// Mostrar formulário de clonagem de agenda
+function mostrarFormularioClonagem() {
+    if (agendas.length === 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Atenção',
+            text: 'Você não possui nenhuma agenda para clonar. Crie uma agenda primeiro.'
+        });
+        return;
+    }
+
+   // Criar opções HTML para o select
+    const opcoes = agendas.map(agenda => {
+        const dataInicio = new Date(agenda.data_inicio).toLocaleDateString('pt-BR');
+        const dataFim = new Date(agenda.data_fim).toLocaleDateString('pt-BR');
+        return `<option value="${agenda.id_agenda}">${agenda.nome} (${dataInicio} - ${dataFim})</option>`;
+    }).join('');
+
+    Swal.fire({
+        title: 'Clonar Agenda',
+        html: `
+            <div class="space-y-4 text-left">
+                <div>
+                    <label class="block mb-2 font-bold">Agenda Origem:</label>
+                    <select id="agendaOrigemClone" class="w-full p-2 border rounded">
+                        ${opcoes}
+                    </select>
+                </div>
+                <div>
+                    <label class="block mb-2 font-bold">Nome da Nova Agenda:</label>
+                    <input type="text" id="nomeNovaAgendaClone" class="w-full p-2 border rounded" placeholder="Ex: Cópia de [Nome Original]" required>
+                </div>
+                <div>
+                    <label class="block mb-2 font-bold">Data de Início:</label>
+                    <input type="date" id="dataInicioClone" class="w-full p-2 border rounded" required>
+                </div>
+                <div>
+                    <label class="block mb-2 font-bold">Data de Fim:</label>
+                    <input type="date" id="dataFimClone" class="w-full p-2 border rounded" required>
+                </div>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Clonar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        width: 500,
+        preConfirm: () => {
+            const agendaOrigemId = document.getElementById('agendaOrigemClone').value;
+            const nomeNova = document.getElementById('nomeNovaAgendaClone').value;
+            const dataInicio = document.getElementById('dataInicioClone').value;
+            const dataFim = document.getElementById('dataFimClone').value;
+
+            if (!agendaOrigemId || !nomeNova || !dataInicio || !dataFim) {
+                Swal.showValidationMessage('Por favor, preencha todos os campos');
+                return false;
+            }
+
+            // Validar datas
+            const inicio = new Date(dataInicio);
+            const fim = new Date(dataFim);
+            
+            if (fim <= inicio) {
+                Swal.showValidationMessage('A data de fim deve ser posterior à data de início');
+                return false;
+            }
+
+            return {
+                agendaOrigemId,
+                nomeNova,
+                dataInicio,
+                dataFim
+            };
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            clonarAgenda(result.value);
+        }
+    });
+
+    // Preencher nome sugerido quando agenda origem mudar
+    setTimeout(() => {
+        const selectOrigem = document.getElementById('agendaOrigemClone');
+        const inputNome = document.getElementById('nomeNovaAgendaClone');
+        
+        if (selectOrigem && inputNome) {
+            const atualizarNomeSugerido = () => {
+                const agendaSelecionada = agendas.find(a => a.id_agenda === selectOrigem.value);
+                if (agendaSelecionada) {
+                    inputNome.value = `Cópia de ${agendaSelecionada.nome}`;
+                }
+            };
+
+            // Definir nome inicial
+            atualizarNomeSugerido();
+            
+            // Atualizar quando mudar seleção
+            selectOrigem.addEventListener('change', atualizarNomeSugerido);
+        }
+    }, 100);
+}
+
+// ADICIONAR: Função para executar a clonagem
+function clonarAgenda(dados) {
+    // Mostrar loading
+    Swal.fire({
+        title: 'Clonando agenda...',
+        text: 'Por favor, aguarde',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    fetch(`/agendas/${dados.agendaOrigemId}/clonar`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            nome: dados.nomeNova,
+            data_inicio: dados.dataInicio,
+            data_fim: dados.dataFim
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.sucesso) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Sucesso!',
+                text: 'Agenda clonada com sucesso!'
+            });
+
+            // Recarregar lista de agendas
+            carregarAgendas();
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: data.mensagem || 'Erro ao clonar agenda'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao clonar agenda:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: 'Falha ao comunicar com o servidor'
+        });
+    });
 }
 
 // Configurar agenda (abrir modal de configuração)
