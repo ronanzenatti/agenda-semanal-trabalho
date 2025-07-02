@@ -459,6 +459,77 @@ def criar_agenda():
     except Exception as e:
         return jsonify({"sucesso": False, "mensagem": str(e)}), 400
 
+@app.route('/agendas/<id_agenda>/clonar', methods=['POST'])
+@requer_autenticacao
+def clonar_agenda(id_agenda):
+    dados = request.json
+    usuario_id = session['usuario_id']
+    
+    try:
+        # 1. Verificar se a agenda origem pertence ao usuário
+        agenda_origem_resp = supabase_client.table('agendas').select('*').eq('id_agenda', id_agenda).eq('usuario_id', usuario_id).maybe_single().execute()
+        if not agenda_origem_resp.data:
+            return jsonify({"sucesso": False, "mensagem": "Agenda origem não encontrada ou não pertence ao usuário."}), 404
+        
+        agenda_origem = agenda_origem_resp.data
+        
+        # 2. Criar a nova agenda
+        nova_agenda_dados = {
+            "usuario_id": usuario_id,
+            "nome": dados.get('nome'),
+            "data_inicio": dados.get('data_inicio'),
+            "data_fim": dados.get('data_fim'),
+            "dias_semana": agenda_origem['dias_semana'],
+            "hora_inicio_padrao": agenda_origem['hora_inicio_padrao'],
+            "hora_fim_padrao": agenda_origem['hora_fim_padrao']
+        }
+        
+        resposta_nova_agenda = supabase_client.table('agendas').insert(nova_agenda_dados).execute()
+        
+        if not resposta_nova_agenda.data:
+            return jsonify({"sucesso": False, "mensagem": "Erro ao criar nova agenda"}), 400
+        
+        nova_agenda_id = resposta_nova_agenda.data[0]['id_agenda']
+        
+        # 3. Clonar configurações de locais (agenda_locais_config)
+        config_origem_resp = supabase_client.table('agenda_locais_config').select('*').eq('agenda_id', id_agenda).execute()
+        
+        if config_origem_resp.data:
+            for config in config_origem_resp.data:
+                nova_config = {
+                    "agenda_id": nova_agenda_id,
+                    "local_id": config['local_id'],
+                    "valor_hora": config['valor_hora']
+                }
+                supabase_client.table('agenda_locais_config').insert(nova_config).execute()
+        
+        # 4. Clonar compromissos
+        compromissos_origem_resp = supabase_client.table('compromissos').select('*').eq('agenda_id', id_agenda).execute()
+        
+        if compromissos_origem_resp.data:
+            for compromisso in compromissos_origem_resp.data:
+                novo_compromisso = {
+                    "agenda_id": nova_agenda_id,
+                    "local_id": compromisso['local_id'],
+                    "dia_semana": compromisso['dia_semana'],
+                    "hora_inicio": compromisso['hora_inicio'],
+                    "hora_fim": compromisso['hora_fim'],
+                    "duracao": compromisso['duracao'],
+                    "descricao": compromisso['descricao'],
+                    "tipo_hora": compromisso['tipo_hora']
+                }
+                supabase_client.table('compromissos').insert(novo_compromisso).execute()
+        
+        return jsonify({
+            "sucesso": True, 
+            "mensagem": "Agenda clonada com sucesso!",
+            "nova_agenda_id": nova_agenda_id
+        }), 201
+        
+    except Exception as e:
+        print(f"Erro ao clonar agenda: {str(e)}")
+        return jsonify({"sucesso": False, "mensagem": f"Erro ao clonar agenda: {str(e)}"}), 500
+
 @app.route('/agendas', methods=['GET'])
 @requer_autenticacao
 def listar_agendas():

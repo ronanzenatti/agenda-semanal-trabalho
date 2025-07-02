@@ -39,6 +39,12 @@ function configurarEventListeners() {
         addScheduleBtn.addEventListener('click', mostrarFormularioNovaAgenda);
     }
 
+    // Botão clonar agenda
+    const cloneScheduleBtn = document.getElementById('cloneScheduleBtn');
+    if (cloneScheduleBtn) {
+        cloneScheduleBtn.addEventListener('click', mostrarModalClonagem);
+    }
+
     // Formulário de nova agenda
     const newScheduleForm = document.getElementById('newScheduleForm');
     if (newScheduleForm) {

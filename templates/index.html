@@ -22,8 +22,10 @@
                         <i class="fas fa-bars"></i>
                     </button>
                     <div class="flex flex-col">
-                        <h1 class="text-xl md:text-2xl font-bold">Agenda de Trabalho - <span class="text-gray-600 text-sm md:text-base" id="userDisplayName"><b>Usuário:</b> </span></h1>
-                        
+                        <h1 class="text-xl md:text-2xl font-bold">Agenda de Trabalho - <span
+                                class="text-gray-600 text-sm md:text-base" id="userDisplayName"><b>Usuário:</b> </span>
+                        </h1>
+
                         <!-- Active Schedule Selector Dropdown -->
                         <div class="mt-2 md:mt-1">
                             <label for="activeScheduleSelector" class="text-sm font-medium text-gray-700">Horário
@@ -37,17 +39,17 @@
                 </div>
                 <!-- Botões para desktop -->
                 <div id="desktop-buttons" class="hidden md:flex gap-2">
-                    <button onclick="openSchedulesModal()"
-                        class="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 font-bold text-sm md:text-base">
-                        <i class="fas fa-calendar-alt mr-2"></i>Meus Horários
-                    </button>
                     <button onclick="openWorkplaceModal()"
                         class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 font-bold text-sm md:text-base">
-                        <i class="fas fa-building mr-2"></i>Locais de Trabalho
+                        <i class="fas fa-building mr-2"></i>1º - Locais de Trabalho
+                    </button>
+                    <button onclick="openSchedulesModal()"
+                        class="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 font-bold text-sm md:text-base">
+                        <i class="fas fa-calendar-alt mr-2"></i>2º - Meus Horários
                     </button>
                     <button onclick="openAppointmentModal()"
                         class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 font-bold text-sm md:text-base">
-                        Novo Compromisso <i class="fas fa-calendar-plus ml-2"></i>
+                        3º - Novo Compromisso <i class="fas fa-calendar-plus ml-2"></i>
                     </button>
                     <button onclick="openHelpModal()"
                         class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 font-bold text-sm md:text-base">
@@ -124,19 +126,19 @@
         <div class="flex flex-col space-y-4">
             <button onclick="openWorkplaceModal(); closeMenu();"
                 class="bg-blue-500 text-white px-4 py-3 rounded hover:bg-blue-600 font-bold w-full text-left">
-                <i class="fas fa-building mr-2"></i>Locais de Trabalho
+                <i class="fas fa-building mr-2"></i>1º - Locais de Trabalho
+            </button>
+            <button onclick="openSchedulesModal(); closeMenu();"
+                class="bg-indigo-500 text-white px-4 py-3 rounded hover:bg-indigo-600 font-bold w-full text-left">
+                <i class="fas fa-calendar-alt mr-2"></i>2º - Meus Horários
             </button>
             <button onclick="openAppointmentModal(); closeMenu();"
                 class="bg-green-500 text-white px-4 py-3 rounded hover:bg-green-600 font-bold w-full text-left">
-                <i class="fas fa-calendar-plus mr-2"></i>Novo Compromisso
+                <i class="fas fa-calendar-plus mr-2"></i>3º - Novo Compromisso
             </button>
             <button onclick="openHelpModal(); closeMenu();"
                 class="bg-yellow-500 text-white px-4 py-3 rounded hover:bg-yellow-600 font-bold w-full text-left">
                 <i class="fas fa-question-circle mr-2"></i>Ajuda
-            </button>
-            <button onclick="openSchedulesModal(); closeMenu();"
-                class="bg-indigo-500 text-white px-4 py-3 rounded hover:bg-indigo-600 font-bold w-full text-left">
-                <i class="fas fa-calendar-alt mr-2"></i>Meus Horários
             </button>
             <hr class="my-2 border-gray-300">
             <button onclick="logout()"
@@ -480,9 +482,14 @@
                 <p class="text-gray-500 italic">Carregando horários...</p>
             </div>
 
-            <button id="addScheduleBtn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mb-4">
-                <i class="fas fa-plus mr-2"></i>Adicionar Novo Horário
-            </button>
+            <div class="flex gap-2 mb-4">
+                <button id="addScheduleBtn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                    <i class="fas fa-plus mr-2"></i>Adicionar Novo Horário
+                </button>
+                <button id="cloneScheduleBtn" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    <i class="fas fa-copy mr-2"></i>Clonar Horário Existente
+                </button>
+            </div>
 
             <div id="scheduleFormContainer" class="hidden border p-4 rounded">
                 <h3 class="font-bold mb-3" id="scheduleFormTitle">Novo Horário</h3>
