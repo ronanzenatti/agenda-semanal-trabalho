@@ -285,138 +285,304 @@
                 </button>
             </div>
 
-            <div class="space-y-6">
-                <!-- Visão Geral -->
-                <div>
-                    <h3 class="text-xl font-bold text-blue-600 mb-2">Visão Geral do Sistema</h3>
-                    <p class="mb-2">A Agenda de Trabalho é um sistema que permite organizar seus compromissos
-                        profissionais, calcular horas trabalhadas e valores a receber, adaptado às suas necessidades
-                        específicas.</p>
-                    <p>Este sistema foi desenvolvido para profissionais que atuam em múltiplos locais de trabalho e
-                        precisam gerenciar sua agenda de forma eficiente.</p>
+            <div class="space-y-8">
+                <!-- Boas-vindas -->
+                <div
+                    class="text-center bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border-l-4 border-blue-500">
+                    <div class="text-4xl mb-3">👋</div>
+                    <h2 class="text-2xl font-bold text-blue-800 mb-2">Bem-vindo à sua Agenda de Trabalho!</h2>
+                    <p class="text-lg text-blue-700">Organize seus horários, calcule seus ganhos e tenha controle total
+                        da sua agenda profissional</p>
                 </div>
 
-                <!-- Principais Funcionalidades -->
-                <div>
-                    <h3 class="text-xl font-bold text-blue-600 mb-2">Principais Funcionalidades</h3>
-                    <ul class="list-disc pl-6 space-y-2">
-                        <li><b>Gerenciamento de Locais de Trabalho:</b> Cadastre diferentes locais onde você trabalha,
-                            configurando cores, valores de hora e relacionamentos entre locais.</li>
-                        <li><b>Agenda Semanal:</b> Visualize e gerencie seus compromissos em uma agenda semanal
-                            intuitiva.</li>
-                        <li><b>Tipos de Hora:</b> Registre diferentes tipos de hora (HA - Hora Aula, HAE, HT - Hora
-                            Trabalho) conforme seu regime de contratação.</li>
-                        <li><b>Cálculos Automáticos:</b> O sistema calcula automaticamente os valores a receber por
-                            semana e por mês, considerando as configurações específicas de cada local.</li>
-                        <li><b>Configurações Personalizáveis:</b> Ajuste os dias da semana exibidos e o horário padrão
-                            de início e término do seu dia de trabalho.</li>
-                    </ul>
+                <!-- O que é o sistema -->
+                <div class="bg-green-50 p-6 rounded-xl border-l-4 border-green-500">
+                    <h3 class="text-xl font-bold text-green-800 mb-3 flex items-center">
+                        <i class="fas fa-lightbulb mr-2"></i>
+                        O que é este sistema?
+                    </h3>
+                    <p class="text-green-700 leading-relaxed">
+                        É sua agenda digital inteligente! Perfeita para professores, consultores, freelancers e
+                        profissionais que trabalham
+                        em múltiplos locais. O sistema calcula automaticamente quanto você vai ganhar por semana e por
+                        mês,
+                        respeitando as regras trabalhistas brasileiras.
+                    </p>
                 </div>
 
-                <!-- Como Utilizar -->
+                <!-- Passo a passo -->
                 <div>
-                    <h3 class="text-xl font-bold text-blue-600 mb-2">Como Utilizar o Sistema</h3>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                        <i class="fas fa-map-marked-alt mr-2 text-blue-600"></i>
+                        Como começar? Siga estes 3 passos simples:
+                    </h3>
 
-                    <div class="mb-4">
-                        <h4 class="font-bold">1. Configurando Locais de Trabalho</h4>
-                        <p>Clique em "Locais de Trabalho" e depois em "Adicionar Local de Trabalho" para configurar:</p>
-                        <ul class="list-disc pl-6">
-                            <li>Nome do local</li>
-                            <li>Cor (para identificação visual na agenda)</li>
-                            <li>Valor por hora</li>
-                            <li>Acréscimo para hora-aula (em %)</li>
-                            <li>Período de carência (tempo mínimo entre compromissos em locais diferentes)</li>
-                            <li>Relacionamento entre locais (importante para controle do limite de 8h diárias)</li>
-                        </ul>
-                    </div>
+                    <div class="grid gap-6">
+                        <!-- Passo 1 -->
+                        <div
+                            class="bg-white border-2 border-blue-200 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+                            <div class="flex items-start space-x-4">
+                                <div
+                                    class="bg-blue-500 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold">
+                                    1</div>
+                                <div class="flex-1">
+                                    <h4 class="text-xl font-bold text-blue-700 mb-3">
+                                        <i class="fas fa-building mr-2"></i>
+                                        Cadastre seus Locais de Trabalho
+                                    </h4>
+                                    <p class="text-gray-700 mb-4">
+                                        Primeiro, vamos cadastrar onde você trabalha. Pode ser escolas, empresas,
+                                        consultórios, ou qualquer lugar onde você presta serviços.
+                                    </p>
+                                    <div class="bg-blue-50 p-4 rounded-lg">
+                                        <p class="font-semibold text-blue-800 mb-2">Para cada local, você vai
+                                            configurar:</p>
+                                        <ul class="list-disc list-inside text-blue-700 space-y-1">
+                                            <li><strong>Nome:</strong> Ex: "Escola Municipal João Silva"</li>
+                                            <li><strong>Cor:</strong> Para identificar visualmente na agenda</li>
+                                            <li><strong>Tempo de deslocamento:</strong> Quantos minutos você precisa
+                                                entre um local e outro</li>
+                                            <li><strong>Bônus para aulas:</strong> Se você é professor e recebe
+                                                adicional nas aulas</li>
+                                            <li><strong>Locais relacionados:</strong> Se dois locais fazem parte da
+                                                mesma empresa/escola</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                    <div class="mb-4">
-                        <h4 class="font-bold">2. Adicionando Compromissos</h4>
-                        <p>Clique em "Novo Compromisso" para adicionar um evento à sua agenda:</p>
-                        <ul class="list-disc pl-6">
-                            <li>Selecione o dia da semana</li>
-                            <li>Escolha o local de trabalho</li>
-                            <li>Defina o tipo de hora (HA, HAE ou HT)</li>
-                            <li>Configure o horário de início e término</li>
-                            <li>Adicione uma descrição do compromisso</li>
-                        </ul>
-                    </div>
+                        <!-- Passo 2 -->
+                        <div
+                            class="bg-white border-2 border-indigo-200 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+                            <div class="flex items-start space-x-4">
+                                <div
+                                    class="bg-indigo-500 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold">
+                                    2</div>
+                                <div class="flex-1">
+                                    <h4 class="text-xl font-bold text-indigo-700 mb-3">
+                                        <i class="fas fa-calendar-alt mr-2"></i>
+                                        Crie sua Agenda (Horário)
+                                    </h4>
+                                    <p class="text-gray-700 mb-4">
+                                        Agora vamos criar sua agenda semanal. Você pode ter várias agendas para
+                                        diferentes períodos do ano.
+                                    </p>
+                                    <div class="bg-indigo-50 p-4 rounded-lg">
+                                        <p class="font-semibold text-indigo-800 mb-2">Ao criar uma agenda, você define:
+                                        </p>
+                                        <ul class="list-disc list-inside text-indigo-700 space-y-1">
+                                            <li><strong>Nome:</strong> Ex: "Horário 1º Semestre 2025"</li>
+                                            <li><strong>Período:</strong> Data de início e fim</li>
+                                            <li><strong>Dias da semana:</strong> Quais dias você trabalha</li>
+                                            <li><strong>Valores por hora:</strong> Quanto você ganha em cada local</li>
+                                            <li><strong>Horário padrão:</strong> Quando sua jornada começa e termina
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                    <div class="mb-4">
-                        <h4 class="font-bold">3. Personalizando a Agenda</h4>
-                        <p>Clique em "Configurações" para personalizar sua experiência:</p>
-                        <ul class="list-disc pl-6">
-                            <li>Selecione quais dias da semana deseja exibir</li>
-                            <li>Ajuste o horário de início e término do seu dia de trabalho</li>
-                        </ul>
-                    </div>
-
-                    <div class="mb-4">
-                        <h4 class="font-bold">4. Visualizando Relatórios</h4>
-                        <p>Na parte inferior da tela, você pode visualizar relatórios de horas trabalhadas e valores a
-                            receber:</p>
-                        <ul class="list-disc pl-6">
-                            <li>Resumo por local de trabalho</li>
-                            <li>Totais semanais</li>
-                            <li>Totais mensais (calculados com base em 4,5 semanas por mês)</li>
-                        </ul>
+                        <!-- Passo 3 -->
+                        <div
+                            class="bg-white border-2 border-green-200 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+                            <div class="flex items-start space-x-4">
+                                <div
+                                    class="bg-green-500 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold">
+                                    3</div>
+                                <div class="flex-1">
+                                    <h4 class="text-xl font-bold text-green-700 mb-3">
+                                        <i class="fas fa-calendar-plus mr-2"></i>
+                                        Adicione seus Compromissos
+                                    </h4>
+                                    <p class="text-gray-700 mb-4">
+                                        Agora é só marcar seus horários de trabalho! O sistema vai organizar tudo
+                                        visualmente e calcular seus ganhos.
+                                    </p>
+                                    <div class="bg-green-50 p-4 rounded-lg">
+                                        <p class="font-semibold text-green-800 mb-2">Para cada compromisso, informe:</p>
+                                        <ul class="list-disc list-inside text-green-700 space-y-1">
+                                            <li><strong>Dia da semana:</strong> Segunda, terça, etc.</li>
+                                            <li><strong>Local de trabalho:</strong> Onde será o compromisso</li>
+                                            <li><strong>Horário:</strong> Entrada e saída</li>
+                                            <li><strong>Tipo de hora:</strong> Aula (HA), Administrativa (HT), etc.</li>
+                                            <li><strong>Descrição:</strong> O que você vai fazer</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Regras Trabalhistas -->
-                <div>
-                    <h3 class="text-xl font-bold text-blue-600 mb-2">Regras Trabalhistas Importantes</h3>
-
-                    <div class="mb-4">
-                        <h4 class="font-bold">Limite de Jornada Diária</h4>
-                        <p>O sistema aplica automaticamente a regra legal de limite de 8 horas diárias de trabalho para
-                            cada local ou grupo de locais relacionados. Esta é uma medida de proteção baseada na CLT
-                            (Consolidação das Leis do Trabalho).</p>
-                    </div>
-
-                    <div class="mb-4">
-                        <h4 class="font-bold">Período de Carência Entre Locais</h4>
-                        <p>É possível configurar um período mínimo entre compromissos em locais diferentes, garantindo
-                            tempo para deslocamento e descanso entre atividades.</p>
-                    </div>
-
-                    <div class="mb-4">
-                        <h4 class="font-bold">Diferenciação de Tipos de Hora</h4>
-                        <p>Conforme regulamentações específicas da sua categoria profissional:</p>
-                        <ul class="list-disc pl-6">
-                            <li><b>HA (Hora Aula):</b> Utilizada principalmente por professores, com possibilidade de
-                                acréscimo percentual.</li>
-                            <li><b>HAE:</b> Hora Atividade Específica, que pode ter valor diferenciado.</li>
-                            <li><b>HT (Hora Trabalho):</b> Utilizada para atividades administrativas ou outras sem
-                                acréscimo específico.</li>
-                        </ul>
-                    </div>
-
-                    <div class="mb-4">
-                        <h4 class="font-bold">Cálculo de Remuneração</h4>
-                        <p>O sistema calcula a remuneração considerando:</p>
-                        <ul class="list-disc pl-6">
-                            <li>Valor base da hora de trabalho no local</li>
-                            <li>Acréscimos percentuais aplicáveis (para hora-aula)</li>
-                            <li>Duração dos compromissos</li>
-                        </ul>
+                <!-- Tipos de hora explicados -->
+                <div class="bg-yellow-50 p-6 rounded-xl border-l-4 border-yellow-500">
+                    <h3 class="text-xl font-bold text-yellow-800 mb-4 flex items-center">
+                        <i class="fas fa-clock mr-2"></i>
+                        Entendendo os Tipos de Hora
+                    </h3>
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div class="bg-white p-4 rounded-lg border border-yellow-200">
+                            <h4 class="font-bold text-yellow-800 mb-2">HA - Hora Aula</h4>
+                            <p class="text-yellow-700 text-sm">Para professores. Pode ter bônus adicional configurado no
+                                local de trabalho.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border border-yellow-200">
+                            <h4 class="font-bold text-yellow-800 mb-2">HAE - Hora Atividade Específica</h4>
+                            <p class="text-yellow-700 text-sm">Atividades especiais como coordenação, supervisão, etc.
+                            </p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border border-yellow-200">
+                            <h4 class="font-bold text-yellow-800 mb-2">HT - Hora Trabalho</h4>
+                            <p class="text-yellow-700 text-sm">Trabalho administrativo, reuniões, ou outras atividades.
+                            </p>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Dicas e Boas Práticas -->
-                <div>
-                    <h3 class="text-xl font-bold text-blue-600 mb-2">Dicas e Boas Práticas</h3>
-                    <ul class="list-disc pl-6 space-y-2">
-                        <li>Utilize cores distintas para cada local de trabalho para facilitar a visualização da agenda.
-                        </li>
-                        <li>Configure corretamente os relacionamentos entre locais quando eles fazem parte da mesma
-                            instituição para controle adequado do limite de 8h.</li>
-                        <li>Revise periodicamente seus relatórios para verificar se há conflitos ou sobrecargas em sua
-                            agenda.</li>
-                        <li>Ao cadastrar compromissos recorrentes, verifique se há feriados ou outras exceções que
-                            precisam ser consideradas.</li>
-                        <li>Mantenha suas configurações de valor/hora atualizadas conforme reajustes salariais.</li>
-                    </ul>
+                <!-- Regras importantes -->
+                <div class="bg-red-50 p-6 rounded-xl border-l-4 border-red-500">
+                    <h3 class="text-xl font-bold text-red-800 mb-4 flex items-center">
+                        <i class="fas fa-shield-alt mr-2"></i>
+                        Proteções Trabalhistas Automáticas
+                    </h3>
+                    <p class="text-red-700 mb-4">O sistema protege você automaticamente seguindo as leis trabalhistas
+                        brasileiras:</p>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-white p-4 rounded-lg border border-red-200">
+                            <h4 class="font-bold text-red-800 mb-2">
+                                <i class="fas fa-clock text-red-600 mr-2"></i>
+                                Máximo 8h por dia
+                            </h4>
+                            <p class="text-red-700 text-sm">Em locais relacionados (mesma empresa), você não pode
+                                trabalhar mais de 8 horas por dia.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border border-red-200">
+                            <h4 class="font-bold text-red-800 mb-2">
+                                <i class="fas fa-route text-red-600 mr-2"></i>
+                                Tempo de deslocamento
+                            </h4>
+                            <p class="text-red-700 text-sm">Respeita o tempo mínimo entre compromissos em locais
+                                diferentes.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border border-red-200">
+                            <h4 class="font-bold text-red-800 mb-2">
+                                <i class="fas fa-bed text-red-600 mr-2"></i>
+                                Máximo 6h contínuas
+                            </h4>
+                            <p class="text-red-700 text-sm">Não permite compromissos de mais de 6 horas seguidas.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border border-red-200">
+                            <h4 class="font-bold text-red-800 mb-2">
+                                <i class="fas fa-moon text-red-600 mr-2"></i>
+                                11h de descanso
+                            </h4>
+                            <p class="text-red-700 text-sm">Garante 11 horas de descanso entre o último compromisso de
+                                um dia e o primeiro do dia seguinte.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Benefícios -->
+                <div class="bg-purple-50 p-6 rounded-xl border-l-4 border-purple-500">
+                    <h3 class="text-xl font-bold text-purple-800 mb-4 flex items-center">
+                        <i class="fas fa-star mr-2"></i>
+                        O que você ganha usando este sistema
+                    </h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-3">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-calculator text-purple-600 text-xl"></i>
+                                <span class="text-purple-700"><strong>Cálculos automáticos</strong> dos seus ganhos
+                                    semanais e mensais</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-eye text-purple-600 text-xl"></i>
+                                <span class="text-purple-700"><strong>Visualização clara</strong> da sua agenda em
+                                    cores</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-share-alt text-purple-600 text-xl"></i>
+                                <span class="text-purple-700"><strong>Compartilhamento</strong> da agenda com colegas e
+                                    família</span>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-mobile-alt text-purple-600 text-xl"></i>
+                                <span class="text-purple-700"><strong>Acesso pelo celular</strong> em qualquer
+                                    lugar</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-chart-line text-purple-600 text-xl"></i>
+                                <span class="text-purple-700"><strong>Relatórios detalhados</strong> por local de
+                                    trabalho</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-copy text-purple-600 text-xl"></i>
+                                <span class="text-purple-700"><strong>Clonar agendas</strong> para novos
+                                    semestres/períodos</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dicas rápidas -->
+                <div class="bg-gray-50 p-6 rounded-xl border-l-4 border-gray-400">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-lightbulb mr-2"></i>
+                        Dicas de Ouro para Usar Melhor
+                    </h3>
+                    <div class="grid md:grid-cols-2 gap-4 text-sm">
+                        <div class="space-y-2">
+                            <p class="flex items-start space-x-2">
+                                <i class="fas fa-palette text-gray-600 mt-0.5"></i>
+                                <span><strong>Use cores diferentes</strong> para cada local - fica mais fácil de
+                                    enxergar na agenda</span>
+                            </p>
+                            <p class="flex items-start space-x-2">
+                                <i class="fas fa-link text-gray-600 mt-0.5"></i>
+                                <span><strong>Configure relacionamentos</strong> entre locais da mesma empresa para
+                                    controle correto das 8h diárias</span>
+                            </p>
+                            <p class="flex items-start space-x-2">
+                                <i class="fas fa-copy text-gray-600 mt-0.5"></i>
+                                <span><strong>Clone agendas</strong> quando o semestre acabar - economiza tempo
+                                    reescrevendo tudo</span>
+                            </p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="flex items-start space-x-2">
+                                <i class="fas fa-mobile text-gray-600 mt-0.5"></i>
+                                <span><strong>No celular</strong>, deslize entre os dias da semana com os botões de
+                                    navegação</span>
+                            </p>
+                            <p class="flex items-start space-x-2">
+                                <i class="fas fa-money-bill-wave text-gray-600 mt-0.5"></i>
+                                <span><strong>Atualize os valores</strong> sempre que houver reajuste salarial</span>
+                            </p>
+                            <p class="flex items-start space-x-2">
+                                <i class="fas fa-chart-bar text-gray-600 mt-0.5"></i>
+                                <span><strong>Consulte os relatórios</strong> regularmente para acompanhar seus
+                                    ganhos</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Call to action -->
+                <div
+                    class="text-center bg-gradient-to-r from-green-50 to-blue-50 p-8 rounded-xl border-2 border-green-200">
+                    <div class="text-4xl mb-4">🚀</div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3">Pronto para começar?</h3>
+                    <p class="text-lg text-gray-700 mb-4">
+                        Que tal cadastrar seu primeiro local de trabalho agora mesmo?
+                    </p>
+                    <p class="text-sm text-gray-600">
+                        Clique no botão <strong class="text-blue-600">"1º - Locais de Trabalho"</strong> e vamos
+                        começar!
+                    </p>
                 </div>
             </div>
 
