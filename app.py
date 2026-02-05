@@ -535,7 +535,7 @@ def clonar_agenda(id_agenda):
 def listar_agendas():
     usuario_id = session['usuario_id']
     try:
-        resposta = supabase_client.table('agendas').select('*').eq('usuario_id', usuario_id).execute()
+        resposta = supabase_client.table('agendas').select('*').eq('usuario_id', usuario_id).order('data_inicio', desc=True).execute()
         return jsonify({"sucesso": True, "agendas": resposta.data})
     except Exception as e:
         return jsonify({"sucesso": False, "mensagem": str(e)}), 400
