@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from supabase_client import supabase_client
 from datetime import timedelta
 import copy
+import re
 
 # Carregar variáveis de ambiente
 load_dotenv()
@@ -316,7 +317,7 @@ def agenda_publica(cpf):
 @app.route('/auth/registrar', methods=['POST'])
 def api_registrar():
     dados = request.json
-    cpf = dados.get('cpf')
+    cpf = re.sub(r'\D', '', dados.get('cpf', ''))
     nome = dados.get('nome')
     email = dados.get('email')
     senha = dados.get('senha')
