@@ -1607,5 +1607,17 @@ def visualizar_agenda_compartilhada(link_publico_id):
         print(f"Erro ao buscar dados da agenda compartilhada {link_publico_id}: {str(e)}")
         return render_template('erro.html', mensagem="Erro ao processar a agenda compartilhada."), 500
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    try:
+        # Query leve apenas para manter o banco ativo
+        supabase_client.table('configuracoes_usuario')\
+            .select('id_configuracao')\
+            .limit(1)\
+            .execute()
+        return jsonify({"status": "ok", "banco": "ativo"}), 200
+    except Exception as e:
+        return jsonify({"status": "erro", "mensagem": str(e)}), 500
+
 if __name__ == '__main__':
     app.run()

@@ -1,0 +1,15 @@
+name: Keepalive Supabase
+
+on:
+  schedule:
+    - cron: '0 10 * * *'  # Executa a cada 5 dias às 10h UTC
+  workflow_dispatch:         # Permite executar manualmente pelo GitHub
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping aplicação para manter Supabase ativo
+        run: |
+          echo "Fazendo ping em: ${{ secrets.APP_URL }}/health"
+          curl -f "${{ secrets.APP_URL }}/health" || echo "Ping falhou"
